@@ -1,0 +1,38 @@
+* {
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: #f1f1f1;
+    font-size: 12px;
+}
+
+.page-grid-content > .n-data-table {
+    position: relative;
+    height: 100%;
+
+    .n-data-table-base-table {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        .n-data-table-base-table-header {
+            flex-shrink: 0;
+        }
+
+        .n-data-table-base-table-body {
+            flex: 1;
+        }
+    }
+}
