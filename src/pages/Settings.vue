@@ -75,6 +75,16 @@ const saveSettings = async () => {
                         :disabled="loading"
                     >
                         <NFlex :vertical="true" size="large">
+                            <NFormItem label="筛选率">
+                                <NRadioGroup v-model:value="settings.filter_rate">
+                                    <NFlex size="large">
+                                        <NRadio :value="1">25%</NRadio>
+                                        <NRadio :value="2">50%</NRadio>
+                                        <NRadio :value="3">75%</NRadio>
+                                        <NRadio :value="4">100%</NRadio>
+                                    </NFlex>
+                                </NRadioGroup>
+                            </NFormItem>
                             <NFormItem label="一次比对条件">
                                 <NInputGroup>
                                     <NInputGroupLabel>皇冠水位 - 推送水位 ≥</NInputGroupLabel>

@@ -7,6 +7,9 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 // https://vite.dev/config/
 export default defineConfig({
     base: '',
+    build: {
+        outDir: './dist/rec02812713/',
+    },
     plugins: [vue(), vueJsx()],
     resolve: {
         alias: [
