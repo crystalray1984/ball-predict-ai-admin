@@ -73,6 +73,10 @@ export function useListLoader<T>(options: UseListLoaderOptions<T>) {
         disabled: loading.value,
         onUpdatePage: (page) => load(page),
         onUpdatePageSize: (pageSize) => load(1, pageSize),
+        prefix: ({ itemCount }) => `共${itemCount}条数据`,
+        showSizePicker: true,
+        pageSize: pageSize.value,
+        pageSizes: [20, 50, 100],
     }))
 
     onMounted(() => {

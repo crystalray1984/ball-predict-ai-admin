@@ -564,6 +564,11 @@
   dependencies:
     undici-types "~6.21.0"
 
+"@vicons/antd@^0.13.0":
+  version "0.13.0"
+  resolved "https://registry.npmmirror.com/@vicons/antd/-/antd-0.13.0.tgz#a81d1fb4acb276191d8e13e96817b768d0d2519c"
+  integrity sha512-yrUGoUSz2BbGupk9ghQOahc04n5H3MwUDM9pVPsLh9U1uqB47oRWZvYRiZaT1JKPqgTgSE6BXcVw4i9MOF4M+g==
+
 "@vitejs/plugin-vue-jsx@^4.2.0":
   version "4.2.0"
   resolved "https://registry.npmmirror.com/@vitejs/plugin-vue-jsx/-/plugin-vue-jsx-4.2.0.tgz#2738ec05d4705ed553a107342017192e37351640"
@@ -1223,6 +1228,11 @@ nanoid@^3.3.8:
   version "3.3.11"
   resolved "https://registry.npmmirror.com/nanoid/-/nanoid-3.3.11.tgz#4f4f112cefbe303202f2199838128936266d185b"
   integrity sha512-N8SpfPUnUp1bK+PMYW8qSWdl9U+wwNWI4QKxOYDy9JAro3WMX7p2OeVRF9v+347pnakNevPmiHhNmZ2HbFA76w==
+
+nanoid@^5.1.5:
+  version "5.1.5"
+  resolved "https://registry.npmmirror.com/nanoid/-/nanoid-5.1.5.tgz#f7597f9d9054eb4da9548cdd53ca70f1790e87de"
+  integrity sha512-Ir/+ZpE9fDsNH0hQ3C68uyThDXzYcim2EqcZ8zn8Chtt1iylPT9xXJB0kPCnqzgcEGikO9RxSrh63MsmVCU7Fw==
 
 needle@^3.1.0:
   version "3.3.1"

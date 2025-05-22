@@ -5,7 +5,9 @@ import { token } from '@/libs/token'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import Dashboard from './pages/Dashboard.vue'
 import Login from './pages/Login.vue'
-import OddView from './pages/OddView.vue'
+import Matches from './pages/Matches.vue'
+import Odds from './pages/Odds.vue'
+import Settings from './pages/Settings.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -26,8 +28,16 @@ export const router = createRouter({
                     component: Dashboard,
                 },
                 {
-                    path: '/odd-view',
-                    component: OddView,
+                    path: '/odds',
+                    component: Odds,
+                },
+                {
+                    path: '/matches',
+                    component: Matches,
+                },
+                {
+                    path: '/settings',
+                    component: Settings,
                 },
             ],
         },

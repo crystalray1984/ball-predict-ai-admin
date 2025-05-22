@@ -19,6 +19,7 @@ export default defineComponent({
 
         return () => (
             <NSelect
+                {...ctx.attrs}
                 {...props}
                 options={options.value}
                 loading={isFetching.value ?? props.loading}

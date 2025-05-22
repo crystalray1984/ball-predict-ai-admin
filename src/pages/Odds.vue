@@ -1,4 +1,6 @@
 <script setup lang="tsx">
+import AddPromoted from '@/components/AddPromoted.vue'
+import MatchScoreSetter from '@/components/MatchScoreSetter.vue'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
 import { FINAL_RULE_TEXT, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
@@ -35,6 +37,7 @@ interface Filter {
 
 interface OddData extends OddInfo {
     id: number
+    match_id: number
     match_time: string
     tournament: Tournament
     team1: Team
@@ -85,19 +88,23 @@ const { load, loading } = useLoader()
 
 const list = ref([]) as Ref<OddData[]>
 
-const applyFilter = async () => {
-    activeFilter.matched1 = filter.matched1
-    activeFilter.matched2 = filter.matched2
-    activeFilter.promoted = filter.promoted
-    activeFilter.variety = filter.variety
-    activeFilter.period = filter.period
-    activeFilter.team = trim(filter.team)
+const mergeFilter = (target: Record<string, any>) => {
+    target.matched1 = filter.matched1
+    target.matched2 = filter.matched2
+    target.promoted = filter.promoted
+    target.variety = filter.variety
+    target.period = filter.period
+    target.team = trim(filter.team)
     if (filter.dates) {
-        activeFilter.start_date = dayjs(filter.dates[0]).format('YYYY-MM-DD')
-        activeFilter.end_date = dayjs(filter.dates[1]).format('YYYY-MM-DD')
+        target.start_date = dayjs(filter.dates[0]).format('YYYY-MM-DD')
+        target.end_date = dayjs(filter.dates[1]).format('YYYY-MM-DD')
     } else {
-        activeFilter.start_date = activeFilter.end_date = undefined
+        target.start_date = target.end_date = undefined
     }
+}
+
+const applyFilter = async () => {
+    mergeFilter(activeFilter)
 
     const ret = await load(() =>
         api<OddData[]>({
@@ -115,6 +122,32 @@ const applyFilter = async () => {
 
 onMounted(applyFilter)
 
+/**
+ * 导出
+ */
+const doExport = () => {
+    const params = {}
+    mergeFilter(params)
+
+    const form = document.createElement('form')
+    form.style.display = 'none'
+    form.method = 'POST'
+    form.action = new URL('/admin/odd/export', import.meta.env.VITE_API_URL || location.href).href
+    form.enctype = 'application/x-www-form-urlencoded'
+
+    Object.entries(params).forEach(([name, value]) => {
+        if (typeof value === 'undefined' || value === null) return
+        const input = document.createElement('input')
+        input.type = 'hidden'
+        input.name = name
+        input.value = String(value)
+        form.appendChild(input)
+    })
+    document.body.appendChild(form)
+    form.submit()
+    document.body.removeChild(form)
+}
+
 const periodOptions: SelectOption[] = Object.entries(PERIOD_TEXT).map(([value, label]) => ({
     value,
     label,
@@ -125,13 +158,36 @@ const varietyOptions: SelectOption[] = Object.entries(VARIETY_TEXT).map(([value,
     label,
 }))
 
+const onAddPromoted = async (match_id: number, odd: OddInfo, orgOdd: OddData): Promise<boolean> => {
+    const ret = await api({
+        url: '/admin/odd/add',
+        data: {
+            match_id,
+            odd_id: orgOdd.id,
+            back: odd.type !== orgOdd.type ? 1 : 0,
+        },
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+        return false
+    } else {
+        await onMatchScoreUpdated(match_id)
+        message.success('操作成功')
+        return true
+    }
+}
+
 const columns: DataTableColumn<OddData>[] = [
     {
         key: 'match_time',
         title: '比赛时间',
-        width: 80,
+        width: 70,
         align: 'center',
         render: (row) => dayjs(row.match_time).format('M/D H:mm'),
+    },
+    {
+        key: 'tournament.name',
+        title: '联赛',
     },
     {
         key: 'team',
@@ -154,16 +210,19 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'period',
         title: '时段',
+        width: 50,
         render: (row) => PERIOD_TEXT[row.period],
     },
     {
         key: 'variety',
         title: '玩法',
+        width: 50,
         render: (row) => VARIETY_TEXT[row.variety],
     },
     {
         key: 'odd',
         title: '盘口',
+        width: 80,
         render: (row) => {
             const texts: string[] = []
             texts.push(ODD_TYPE_TEXT[row.type])
@@ -239,6 +298,7 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'promoted_status',
         title: '推荐',
+        width: 80,
         render: (row) => {
             if (!row.promoted) return
             if (row.promoted.is_valid) {
@@ -261,6 +321,7 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'promote',
         title: '推荐内容',
+        width: 120,
         render: (row) => {
             if (!row.promoted) return
             const texts: string[] = []
@@ -291,6 +352,7 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'result',
         title: '结果',
+        width: 80,
         render: (row) => {
             if (!row.promoted) return
             if (!row.promoted.result) return '待定'
@@ -322,6 +384,7 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'actions',
         title: '操作',
+        width: 140,
         render: (row) => {
             const allowSetResult = (() => {
                 if (row.has_score) return false
@@ -331,6 +394,8 @@ const columns: DataTableColumn<OddData>[] = [
             })()
 
             const allowAdd = (() => {
+                if (row.status === 'ready') return false
+                if (!row.has_score) return false
                 if (!row.promoted) return true
                 if (row.promoted.is_valid) return false
                 if (row.promoted.skip === 'manual_promote') return false
@@ -340,37 +405,113 @@ const columns: DataTableColumn<OddData>[] = [
 
             return (
                 <NFlex align="center" size={4}>
-                    <NButton
-                        type="info"
-                        ghost={true}
-                        size="small"
-                        style={{
-                            visibility: allowSetResult ? 'visible' : 'hidden',
+                    <MatchScoreSetter onSuccess={onMatchScoreUpdated}>
+                        {{
+                            default: ({ open }: { open(id: number, period1?: boolean): void }) => (
+                                <NButton
+                                    type="info"
+                                    ghost={true}
+                                    size="tiny"
+                                    style={{
+                                        visibility: allowSetResult ? 'visible' : 'hidden',
+                                    }}
+                                    onClick={() => open(row.match_id, row.period === 'period1')}
+                                >
+                                    设赛果
+                                </NButton>
+                            ),
                         }}
-                    >
-                        设置赛果
-                    </NButton>
-                    <NButton
-                        type="warning"
-                        ghost={true}
-                        size="small"
-                        style={{
-                            visibility: allowAdd ? 'visible' : 'hidden',
+                    </MatchScoreSetter>
+
+                    <AddPromoted onSubmit={(match_id, info) => onAddPromoted(match_id, info, row)}>
+                        {{
+                            default: ({
+                                open,
+                            }: {
+                                open: (match_id: number, odd?: OddInfo) => void
+                            }) => (
+                                <NButton
+                                    type="warning"
+                                    ghost={true}
+                                    size="tiny"
+                                    style={{
+                                        visibility: allowAdd ? 'visible' : 'hidden',
+                                    }}
+                                    onClick={() => addPromote(open, row)}
+                                >
+                                    补推荐
+                                </NButton>
+                            ),
                         }}
-                    >
-                        加入推荐
-                    </NButton>
+                    </AddPromoted>
                 </NFlex>
             )
         },
     },
 ]
+
+const onMatchScoreUpdated = async (match_id: number) => {
+    const ret = await api<OddData[]>({
+        url: '/admin/odd/list_by_match',
+        data: {
+            match_id,
+        },
+    })
+    if (ret.code) return
+    ret.data.forEach((odd) => {
+        const index = list.value.findIndex((t) => t.id === odd.id)
+        if (index !== -1) {
+            list.value.splice(index, 1, odd)
+        }
+    })
+}
+
+/**
+ * 补推荐
+ */
+const addPromote = (
+    handler: (
+        match_id: number,
+        odd?: OddInfo,
+        allowChange?: boolean,
+        allowReverse?: boolean,
+    ) => void,
+    odd: OddData,
+) => {
+    if (odd.promoted) {
+        //有推荐的，就按推荐的内容生成，不允许修改
+        handler(
+            odd.match_id,
+            {
+                variety: odd.promoted.variety,
+                type: odd.promoted.type,
+                period: odd.promoted.period,
+                condition: odd.promoted.condition,
+            },
+            false,
+            false,
+        )
+    } else {
+        //没有推荐，按原始盘口的正推生成
+        handler(
+            odd.match_id,
+            {
+                variety: odd.variety,
+                period: odd.period,
+                type: odd.type,
+                condition: odd.condition,
+            },
+            false,
+            true,
+        )
+    }
+}
 </script>
 <template>
     <PageGrid :useContentScroller="false">
         <template #header>
             <NForm labelPlacement="left" :inline="true" :disabled="loading" :showFeedback="false">
-                <NFormItem label="日期范围">
+                <NFormItem label="日期">
                     <NDatePicker
                         type="daterange"
                         v-model:value="filter.dates"
@@ -440,7 +581,12 @@ const columns: DataTableColumn<OddData>[] = [
                         placeholder="不限"
                     />
                 </NFormItem>
-                <NButton type="primary" :loading="loading" @click="applyFilter">查询</NButton>
+                <NFormItem>
+                    <NButton type="primary" :loading="loading" @click="applyFilter">查询</NButton>
+                </NFormItem>
+                <NFormItem>
+                    <NButton type="info" @click="doExport">导出</NButton>
+                </NFormItem>
             </NForm>
         </template>
         <NDataTable
@@ -453,6 +599,7 @@ const columns: DataTableColumn<OddData>[] = [
             :striped="true"
             :bordered="true"
             :singleLine="false"
+            maxHeight="100%"
         />
     </PageGrid>
 </template>
