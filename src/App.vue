@@ -7,6 +7,7 @@ import {
     dateZhCN,
     zhCN,
     darkTheme,
+    NDialogProvider,
 } from 'naive-ui'
 </script>
 
@@ -56,7 +57,9 @@ import {
     >
         <NMessageProvider>
             <NModalProvider>
-                <RouterView />
+                <NDialogProvider>
+                    <RouterView />
+                </NDialogProvider>
             </NModalProvider>
         </NMessageProvider>
     </NConfigProvider>

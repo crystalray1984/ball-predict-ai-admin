@@ -5,6 +5,7 @@ import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
 import { FINAL_RULE_TEXT, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
+import { useDialog } from '@/libs/ui'
 import dayjs from 'dayjs'
 import Decimal from 'decimal.js'
 import { trim } from 'lodash-es'
@@ -22,7 +23,7 @@ import {
     type DataTableColumn,
     type SelectOption,
 } from 'naive-ui'
-import { onMounted, reactive, ref, type Ref } from 'vue'
+import { onBeforeUnmount, onMounted, reactive, ref, type Ref } from 'vue'
 
 interface Filter {
     tournament_id?: number
@@ -49,6 +50,7 @@ interface OddData extends OddInfo {
     status: OddStatus
     final_rule: PromotedFinalRule
     promoted?: {
+        id: number
         result: {
             result: number
             score: string
@@ -103,20 +105,32 @@ const mergeFilter = (target: Record<string, any>) => {
     }
 }
 
-const applyFilter = async () => {
-    mergeFilter(activeFilter)
+let timer: any
+onBeforeUnmount(() => {
+    clearInterval(timer)
+})
 
-    const ret = await load(() =>
-        api<OddData[]>({
-            url: '/admin/odd/list',
-            data: activeFilter,
-        }),
-    )
+const loadData = async () => {
+    const ret = await api<OddData[]>({
+        url: '/admin/odd/list',
+        data: activeFilter,
+    })
 
     if (ret.code) {
         message.warning(ret.msg)
+        return true
     } else {
         list.value = ret.data
+        return false
+    }
+}
+
+const applyFilter = async () => {
+    clearInterval(timer)
+    mergeFilter(activeFilter)
+    const success = await load(loadData)
+    if (success) {
+        timer = setInterval(loadData, 30000)
     }
 }
 
@@ -175,6 +189,34 @@ const onAddPromoted = async (match_id: number, odd: OddInfo, orgOdd: OddData): P
         message.success('操作成功')
         return true
     }
+}
+
+const dialog = useDialog()
+
+/**
+ * 删除推荐
+ * @param odd
+ */
+const removePromote = async (odd: OddData) => {
+    if (!odd.promoted || !odd.promoted.is_valid) return
+    const close = await dialog.confirmAndWait({
+        title: '确认要删除这个推荐？',
+    })
+    if (!close) return
+
+    const ret = await api({
+        url: '/admin/odd/remove_promoted',
+        data: {
+            id: odd.promoted.id,
+        },
+    })
+    if (ret.code) {
+        message.warning(ret.msg)
+    } else {
+        await onMatchScoreUpdated(odd.match_id)
+        message.success('操作成功')
+    }
+    close()
 }
 
 const columns: DataTableColumn<OddData>[] = [
@@ -384,7 +426,7 @@ const columns: DataTableColumn<OddData>[] = [
     {
         key: 'actions',
         title: '操作',
-        width: 140,
+        width: 180,
         render: (row) => {
             const allowSetResult = (() => {
                 if (row.has_score) return false
@@ -402,6 +444,8 @@ const columns: DataTableColumn<OddData>[] = [
                 if (row.promoted.skip === 'same_type') return false
                 return true
             })()
+
+            const allowRemove = !!row.promoted && !!row.promoted.is_valid
 
             return (
                 <NFlex align="center" size={4}>
@@ -444,6 +488,18 @@ const columns: DataTableColumn<OddData>[] = [
                             ),
                         }}
                     </AddPromoted>
+
+                    <NButton
+                        type="error"
+                        ghost={true}
+                        size="tiny"
+                        style={{
+                            visibility: allowRemove ? 'visible' : 'hidden',
+                        }}
+                        onClick={() => removePromote(row)}
+                    >
+                        删推荐
+                    </NButton>
                 </NFlex>
             )
         },
