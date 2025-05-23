@@ -172,12 +172,21 @@ export function getReverseOdd({
  * @param type
  */
 export function conditionText(condition: string, type: OddType) {
-    const value = Decimal(condition)
     switch (type) {
         case 'ah1':
         case 'ah2':
-            return (value.gt(0) ? '+' : '') + value.toString()
+            return numberWithSymbol(condition)
         default:
-            return value.toString()
+            return Decimal(condition).toString()
     }
+}
+
+/**
+ * 带有符号的数值
+ * @param value
+ * @returns
+ */
+export function numberWithSymbol(value: string) {
+    const dec = Decimal(value)
+    return (dec.gt(0) ? '+' : '') + dec.toString()
 }

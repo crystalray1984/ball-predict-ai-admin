@@ -1,5 +1,11 @@
 <script lang="tsx" setup>
-import { isNullOrUndefined, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
+import {
+    isNullOrUndefined,
+    numberWithSymbol,
+    ODD_TYPE_TEXT,
+    PERIOD_TEXT,
+    VARIETY_TEXT,
+} from '@/libs/helpers'
 import { ArrowDownOutlined, ArrowUpOutlined, CloseCircleOutlined } from '@vicons/antd'
 import Decimal from 'decimal.js'
 import { eq } from 'lodash-es'
@@ -11,8 +17,6 @@ import {
     NFormItem,
     NIcon,
     NInputGroup,
-    NRadio,
-    NRadioGroup,
     NSelect,
     useMessage,
     type DataTableColumn,
@@ -24,7 +28,7 @@ import { ActionModal } from './modal'
 
 const props = defineProps({
     list: {
-        type: Array as PropType<SpecialReverse[]>,
+        type: Array as PropType<AdjustCondition[]>,
         required: true,
     },
     disabled: {
@@ -47,7 +51,7 @@ const remove = (index: number) => {
     props.list.splice(index, 1)
 }
 
-const columns: DataTableColumn<SpecialReverse>[] = [
+const columns: DataTableColumn<AdjustCondition>[] = [
     {
         key: 'period',
         title: '时段',
@@ -72,9 +76,9 @@ const columns: DataTableColumn<SpecialReverse>[] = [
                 : '-',
     },
     {
-        key: 'back',
-        title: '推荐方向',
-        render: (row) => (row.back ? '反推' : '正推'),
+        key: 'adjust',
+        title: '变盘',
+        render: (row) => numberWithSymbol(row.adjust),
     },
     {
         key: 'actions',
@@ -128,7 +132,7 @@ const columns: DataTableColumn<SpecialReverse>[] = [
 
 const addModal = reactive({
     show: false,
-    data: null as unknown as SpecialReverse,
+    data: null as unknown as AdjustCondition,
 })
 
 const periodOptions = Object.entries(PERIOD_TEXT).map(([value, label]) => ({ value, label }))
@@ -137,13 +141,29 @@ const oddTypeOptions = Object.entries(ODD_TYPE_TEXT)
     .filter((t) => t[0] !== 'draw')
     .map(([value, label]) => ({ value, label }))
 
+const adjustOptions = (() => {
+    let start = Decimal('-10')
+    const output: { value: string; label: string }[] = []
+    while (start.lte(10)) {
+        if (start.eq(0)) {
+            start = start.add('0.25')
+            continue
+        }
+        const value = start.toString()
+        const label = numberWithSymbol(value)
+        output.push({ value, label })
+        start = start.add('0.25')
+    }
+    return output
+})()
+
 /**
  * 添加规则
  */
 const add = () => {
     addModal.data = {
         id: nanoid(),
-        back: true,
+        adjust: '0.25',
         condition: '0',
     }
     addModal.show = true
@@ -159,7 +179,7 @@ const submitAdd = () => {
         isNullOrUndefined(addModal.data.type) &&
         isNullOrUndefined(addModal.data.condition_symbol)
     ) {
-        message.warning('时段、玩法、原始盘口方向、盘口这4个条件必须限制至少1个')
+        message.warning('时段、玩法、盘口方向、盘口这4个条件必须限制至少1个')
         return
     }
 
@@ -173,7 +193,7 @@ const submitAdd = () => {
     })
 
     if (exists) {
-        message.warning('已经存在相同条件的特殊规则')
+        message.warning('已经存在相同条件的规则')
         return
     }
 
@@ -212,7 +232,7 @@ const submitAdd = () => {
             :style="{ width: '400px' }"
             @positiveClick="submitAdd"
         >
-            <NForm :showFeedback="false" labelWidth="88px" labelPlacement="left">
+            <NForm :showFeedback="false" labelWidth="68px" labelPlacement="left">
                 <NFlex :vertical="true" size="large">
                     <NFormItem label="时段">
                         <NSelect
@@ -230,7 +250,7 @@ const submitAdd = () => {
                             placeholder="不限"
                         />
                     </NFormItem>
-                    <NFormItem label="原始盘口方向">
+                    <NFormItem label="盘口方向">
                         <NSelect
                             v-model:value="addModal.data.type"
                             :options="oddTypeOptions"
@@ -259,13 +279,8 @@ const submitAdd = () => {
                             />
                         </NInputGroup>
                     </NFormItem>
-                    <NFormItem label="推荐方向">
-                        <NRadioGroup v-model:value="addModal.data.back">
-                            <NFlex size="large">
-                                <NRadio :value="false">正推</NRadio>
-                                <NRadio :value="true">反推</NRadio>
-                            </NFlex>
-                        </NRadioGroup>
+                    <NFormItem label="变盘">
+                        <NSelect v-model:value="addModal.data.adjust" :options="adjustOptions" />
                     </NFormItem>
                 </NFlex>
             </NForm>

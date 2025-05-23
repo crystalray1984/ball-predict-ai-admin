@@ -134,6 +134,7 @@ const submitAdd = () => {
 <template>
     <NFlex :vertical="true" :inline="false">
         <NDataTable
+            v-if="list.length > 0"
             :style="{ width: '100%' }"
             :data="list"
             :columns="columns"
@@ -192,6 +193,7 @@ const submitAdd = () => {
                                 :options="[
                                     { value: '>', label: '大于' },
                                     { value: '>=', label: '大于等于' },
+                                    { value: '=', label: '等于' },
                                     { value: '<', label: '小于' },
                                     { value: '<=', label: '小于等于' },
                                 ]"

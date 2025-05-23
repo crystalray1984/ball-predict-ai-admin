@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import AdjustConditionEditor from '@/components/AdjustConditionEditor.vue'
 import SpecialEnableEditor from '@/components/SpecialEnableEditor.vue'
 import SpecialReverseEditor from '@/components/SpecialReverseEditor.vue'
 import { api } from '@/libs/api'
@@ -85,21 +86,21 @@ const saveSettings = async () => {
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>
-                            <NFormItem label="一次比对条件">
+                            <NFormItem label="一次比对:水位差">
                                 <NInputGroup>
-                                    <NInputGroupLabel>皇冠水位 - 推送水位 ≥</NInputGroupLabel>
+                                    <NInputGroupLabel>≥</NInputGroupLabel>
                                     <NInput v-model:value="settings.ready_condition" />
                                 </NInputGroup>
                             </NFormItem>
-                            <NFormItem label="二次比对:球探网趋势">
+                            <!-- <NFormItem label="二次比对:球探网趋势">
                                 <NRadioGroup v-model:value="settings.titan007_promote_enable">
                                     <NFlex size="large">
                                         <NRadio :value="true">开启</NRadio>
                                         <NRadio :value="false">关闭</NRadio>
                                     </NFlex>
                                 </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="二次比对:皇冠变盘">
+                            </NFormItem> -->
+                            <NFormItem label="二次比对:变盘">
                                 <NRadioGroup v-model:value="settings.allow_promote_1">
                                     <NFlex size="large">
                                         <NRadio :value="true">开启</NRadio>
@@ -107,7 +108,7 @@ const saveSettings = async () => {
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>
-                            <NFormItem label="二次比对:皇冠水位">
+                            <NFormItem label="二次比对:水位差">
                                 <NInputGroup>
                                     <NSelect
                                         v-model:value="settings.promote_symbol"
@@ -146,17 +147,21 @@ const saveSettings = async () => {
                             </NFormItem>
                             <NFormItem label="推荐:特殊规则">
                                 <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <SpecialEnableEditor :list="settings.special_enable" />
+                                    <SpecialEnableEditor
+                                        :list="settings.special_enable"
+                                        :disabled="loading"
+                                    />
                                     <span
                                         >满足任一规则，则忽略"推荐:半场","推荐:角球"和"推荐:半场角球"，直接进入推荐</span
                                     >
                                 </NFlex>
                             </NFormItem>
-                            <NFormItem label="推荐方向:全局">
-                                <NRadioGroup v-model:value="settings.promote_reverse">
+
+                            <NFormItem label="推荐方向:球探网趋势">
+                                <NRadioGroup v-model:value="settings.titan007_reverse">
                                     <NFlex size="large">
-                                        <NRadio :value="false">正推</NRadio>
-                                        <NRadio :value="true">反推</NRadio>
+                                        <NRadio :value="true">开启</NRadio>
+                                        <NRadio :value="false">关闭</NRadio>
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>
@@ -168,10 +173,32 @@ const saveSettings = async () => {
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>
+                            <NFormItem label="推荐方向:全局">
+                                <NRadioGroup v-model:value="settings.promote_reverse">
+                                    <NFlex size="large">
+                                        <NRadio :value="false">正推</NRadio>
+                                        <NRadio :value="true">反推</NRadio>
+                                    </NFlex>
+                                </NRadioGroup>
+                            </NFormItem>
                             <NFormItem label="推荐方向:特殊">
                                 <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <SpecialReverseEditor :list="settings.special_reverse" />
+                                    <SpecialReverseEditor
+                                        :list="settings.special_reverse"
+                                        :disabled="loading"
+                                    />
                                     <span>规则越靠前，优先级越高</span>
+                                </NFlex>
+                            </NFormItem>
+                            <NFormItem label="自动变盘规则">
+                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
+                                    <AdjustConditionEditor
+                                        :list="settings.adjust_condition"
+                                        :disabled="loading"
+                                    />
+                                    <span>
+                                        规则越靠前，优先级越高，一旦触发一个规则则不再触发另一个
+                                    </span>
                                 </NFlex>
                             </NFormItem>
                         </NFlex>
@@ -189,19 +216,47 @@ const saveSettings = async () => {
                         >
                             <NFlex :vertical="true" size="large">
                                 <NFormItem label="min-profit">
-                                    <NInput v-model:value="settings.surebet_min_profit" />
+                                    <NInput
+                                        v-model:value="settings.surebet_min_profit"
+                                        placeholder=""
+                                    />
                                 </NFormItem>
                                 <NFormItem label="max-profit">
-                                    <NInput v-model:value="settings.surebet_max_profit" />
+                                    <NInput
+                                        v-model:value="settings.surebet_max_profit"
+                                        placeholder=""
+                                    />
                                 </NFormItem>
                                 <NFormItem label="outcomes">
-                                    <NInput v-model:value="settings.surebet_outcomes" />
+                                    <NInput
+                                        v-model:value="settings.surebet_outcomes"
+                                        placeholder=""
+                                    />
                                 </NFormItem>
                                 <NFormItem label="startOf">
-                                    <NInput v-model:value="settings.surebet_start_of" />
+                                    <NInput
+                                        v-model:value="settings.surebet_start_of"
+                                        placeholder=""
+                                    />
                                 </NFormItem>
                                 <NFormItem label="endOf">
-                                    <NInput v-model:value="settings.surebet_end_of" />
+                                    <NInput
+                                        v-model:value="settings.surebet_end_of"
+                                        placeholder=""
+                                    />
+                                </NFormItem>
+                                <NFormItem label="水位范围">
+                                    <NInputGroup>
+                                        <NInput
+                                            v-model:value="settings.min_surebet_value"
+                                            placeholder=""
+                                        />
+                                        <NInputGroupLabel> - </NInputGroupLabel>
+                                        <NInput
+                                            v-model:value="settings.max_surebet_value"
+                                            placeholder=""
+                                        />
+                                    </NInputGroup>
                                 </NFormItem>
                             </NFlex>
                         </NForm>

@@ -133,7 +133,7 @@ declare interface Setting {
     corner_reverse: boolean
     period1_enable: boolean
     promote_reverse: boolean
-    titan007_promote_enable: boolean
+    titan007_reverse: boolean
 
     filter_rate: number
     min_surebet_value: string
@@ -147,6 +147,8 @@ declare interface Setting {
     special_reverse: SpecialReverse[]
 
     special_enable: SpecialEnable[]
+
+    adjust_condition: AdjustCondition[]
 }
 
 /**
@@ -163,6 +165,10 @@ declare interface SpecialEnable extends Partial<OddInfo> {
  */
 declare interface SpecialReverse extends SpecialEnable {
     back: boolean
+}
+
+declare interface AdjustCondition extends SpecialEnable {
+    adjust: string
 }
 
 declare interface AddPromotedOddInfo extends OddInfo {
