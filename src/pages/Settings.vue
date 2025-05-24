@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import AdjustConditionEditor from '@/components/AdjustConditionEditor.vue'
+import SpecialConfigEditor from '@/components/SpecialConfigEditor.vue'
 import SpecialEnableEditor from '@/components/SpecialEnableEditor.vue'
 import SpecialReverseEditor from '@/components/SpecialReverseEditor.vue'
 import { api } from '@/libs/api'
@@ -20,6 +21,7 @@ import {
     NRadioGroup,
     NRow,
     NSelect,
+    NSlider,
     useMessage,
 } from 'naive-ui'
 import { onMounted, ref, type Ref } from 'vue'
@@ -112,6 +114,14 @@ const saveSettings = async () => {
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>
+
+                            <NFormItem v-if="settings.allow_promote_1" label="变盘配置">
+                                <SpecialConfigEditor
+                                    :list="settings.special_config"
+                                    :disabled="loading"
+                                />
+                            </NFormItem>
+
                             <NFormItem label="二次比对:水位差">
                                 <NInputGroup>
                                     <NSelect

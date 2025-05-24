@@ -7,6 +7,11 @@ import { token as appToken } from './token'
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     method: 'POST',
+    headers: {
+        common: {
+            __debug: '1',
+        },
+    },
 })
 
 export type OnAuthorzationFailHandler = () => void | Promise<void>

@@ -151,6 +151,14 @@ declare interface Setting {
     special_enable: SpecialEnable[]
 
     adjust_condition: AdjustCondition[]
+
+    special_config: SpecialConfig[]
+}
+
+declare interface SpecialConfig {
+    delta: number
+    back: number
+    auto_adjust: number
 }
 
 /**
