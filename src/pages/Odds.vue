@@ -128,10 +128,10 @@ const loadData = async () => {
 
     if (ret.code) {
         message.warning(ret.msg)
-        return true
+        return false
     } else {
         list.value = ret.data
-        return false
+        return true
     }
 }
 
