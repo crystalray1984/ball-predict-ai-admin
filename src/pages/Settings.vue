@@ -161,7 +161,7 @@ const saveSettings = async () => {
                                 </NFlex>
                             </NFormItem>
 
-                            <NFormItem label="推荐方向:球探网趋势">
+                            <NFormItem label="推荐方向:趋势">
                                 <NRadioGroup v-model:value="settings.titan007_reverse">
                                     <NFlex size="large">
                                         <NRadio :value="true">开启</NRadio>
@@ -211,7 +211,7 @@ const saveSettings = async () => {
             </NCol>
             <NCol :span="10">
                 <NFlex :vertical="true" :inline="false">
-                    <NCard :segmented="true" size="small" title="Surebet抓取配置">
+                    <NCard :segmented="true" size="small" title="抓取配置">
                         <NForm
                             labelPlacement="left"
                             labelWidth="80px"
