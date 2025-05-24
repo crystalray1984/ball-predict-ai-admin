@@ -638,9 +638,8 @@ const addPromote = (
                         v-model:value="filter.matched2"
                         :options="[
                             { value: 1, label: '成功' },
-                            { value: 'titan007', label: '成功:球探网趋势' },
-                            { value: 'crown', label: '成功:皇冠水位' },
-                            { value: 'crown_special', label: '成功:皇冠变盘' },
+                            { value: 'crown', label: '成功:水位' },
+                            { value: 'crown_special', label: '成功:变盘' },
                             { value: 0, label: '失败' },
                         ]"
                         :consistentMenuWidth="false"
