@@ -60,12 +60,12 @@ const columns: DataTableColumn<SpecialReverse>[] = [
     },
     {
         key: 'type',
-        title: '方向',
+        title: '原始方向',
         render: (row) => (row.type ? ODD_TYPE_TEXT[row.type] : '-'),
     },
     {
         key: 'condition',
-        title: '盘口',
+        title: '原始盘口',
         render: (row) =>
             !isNullOrUndefined(row.condition_symbol) && !isNullOrUndefined(row.condition)
                 ? `${row.condition_symbol} ${row.condition}`
@@ -238,7 +238,7 @@ const submitAdd = () => {
                             placeholder="不限"
                         />
                     </NFormItem>
-                    <NFormItem label="盘口条件">
+                    <NFormItem label="原始盘口条件">
                         <NInputGroup>
                             <NSelect
                                 v-model:value="addModal.data.condition_symbol"
