@@ -21,7 +21,6 @@ import {
     NRadioGroup,
     NRow,
     NSelect,
-    NSlider,
     useMessage,
 } from 'naive-ui'
 import { onMounted, ref, type Ref } from 'vue'
