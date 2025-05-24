@@ -15,6 +15,7 @@ import {
     NInput,
     NInputGroup,
     NInputGroupLabel,
+    NInputNumber,
     NRadio,
     NRadioGroup,
     NRow,
@@ -92,14 +93,17 @@ const saveSettings = async () => {
                                     <NInput v-model:value="settings.ready_condition" />
                                 </NInputGroup>
                             </NFormItem>
-                            <!-- <NFormItem label="二次比对:球探网趋势">
-                                <NRadioGroup v-model:value="settings.titan007_promote_enable">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem> -->
+                            <NFormItem label="二次比对时间">
+                                <NFlex align="center">
+                                    <NInputNumber
+                                        v-model:value="settings.final_check_time"
+                                        :min="1"
+                                        :precision="0"
+                                        :step="1"
+                                    />
+                                    <span>分钟</span>
+                                </NFlex>
+                            </NFormItem>
                             <NFormItem label="二次比对:变盘">
                                 <NRadioGroup v-model:value="settings.allow_promote_1">
                                     <NFlex size="large">

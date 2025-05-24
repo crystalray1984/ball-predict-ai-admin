@@ -127,6 +127,8 @@ declare interface Setting {
     surebet_min_profit: string
     surebet_max_profit: string
 
+    final_check_time: number
+
     allow_promote_1: boolean
     corner_enable: boolean
     corner_period1_enable: boolean

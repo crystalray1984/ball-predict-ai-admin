@@ -3,7 +3,7 @@ import AddPromoted from '@/components/AddPromoted.vue'
 import MatchScoreSetter from '@/components/MatchScoreSetter.vue'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
-import { FINAL_RULE_TEXT, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
+import { dateTime, FINAL_RULE_TEXT, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
 import { useDialog } from '@/libs/ui'
 import dayjs from 'dayjs'
@@ -62,6 +62,8 @@ interface OddData extends OddInfo {
     } & OddInfo
     has_score: number
     has_period1_score: number
+    created_at: string
+    ready_at: string | null
 }
 
 const start = dayjs().subtract(2, 'day').startOf('day')
@@ -288,6 +290,16 @@ const columns: DataTableColumn<OddData>[] = [
         title: '一次水位',
         width: 70,
         render: (row) => (row.crown_value ? Decimal(row.crown_value).toFixed(4) : ''),
+    },
+    {
+        key: 'created_at',
+        title: '一次比对时间',
+        width: 90,
+        align: 'center',
+        render: (row) => {
+            if (!row.ready_at) return
+            return dateTime(row.ready_at, 'M/D H:mm')
+        },
     },
     {
         key: 'crown_condition2',
