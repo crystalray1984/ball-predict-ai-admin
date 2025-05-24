@@ -34,6 +34,13 @@ export const FINAL_RULE_TEXT: Record<PromotedFinalRule, string> = {
     crown_special: '皇冠变盘',
 }
 
+export const PROMOTE_RULE_TEXT: Record<string, string> = {
+    '': '',
+    special: '特殊',
+    special_config: '变盘',
+    corner: '角球',
+}
+
 export function date(input: ConfigType, format = 'YYYY-MM-DD') {
     if (typeof input === 'undefined' || input === null) return ''
     return dayjs(input).format(format)

@@ -1,5 +1,5 @@
 <script setup lang="tsx">
-import { NDataTable, NFlex, NRadio, NRadioGroup, type DataTableColumn } from 'naive-ui'
+import { NDataTable, NFlex, NRadio, NRadioGroup, NSwitch, type DataTableColumn } from 'naive-ui'
 import type { PropType } from 'vue'
 
 const props = defineProps({
@@ -21,6 +21,24 @@ const columns: DataTableColumn<SpecialConfig>[] = [
             index === props.list.length - 1 ? `${row.delta}或更多` : row.delta,
     },
     {
+        key: 'enable',
+        title: '允许推荐',
+        render: (row) => (
+            <NSwitch
+                value={row.enable}
+                checkedValue={true}
+                uncheckedValue={false}
+                disabled={props.disabled}
+                onUpdateValue={(v) => (row.enable = v)}
+            >
+                {{
+                    checked: () => '开启',
+                    unchecked: () => '关闭',
+                }}
+            </NSwitch>
+        ),
+    },
+    {
         key: 'back',
         title: '强制推荐方向',
         render: (row) => (
@@ -29,6 +47,7 @@ const columns: DataTableColumn<SpecialConfig>[] = [
                 onUpdateValue={(value) => {
                     row.back = value
                 }}
+                disabled={props.disabled || !row.enable}
             >
                 <NFlex>
                     <NRadio value={0}>正推</NRadio>
@@ -47,6 +66,7 @@ const columns: DataTableColumn<SpecialConfig>[] = [
                 onUpdateValue={(value) => {
                     row.auto_adjust = value
                 }}
+                disabled={props.disabled || !row.enable}
             >
                 <NFlex>
                     <NRadio value={false}>原始盘口</NRadio>

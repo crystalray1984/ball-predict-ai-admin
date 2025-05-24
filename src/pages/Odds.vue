@@ -3,7 +3,14 @@ import AddPromoted from '@/components/AddPromoted.vue'
 import MatchScoreSetter from '@/components/MatchScoreSetter.vue'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
-import { dateTime, FINAL_RULE_TEXT, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
+import {
+    dateTime,
+    FINAL_RULE_TEXT,
+    ODD_TYPE_TEXT,
+    PERIOD_TEXT,
+    PROMOTE_RULE_TEXT,
+    VARIETY_TEXT,
+} from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
 import { useDialog } from '@/libs/ui'
 import dayjs from 'dayjs'
@@ -59,6 +66,7 @@ interface OddData extends OddInfo {
         skip: PromotedSkip
         is_valid: number
         score: string
+        final_rule: string
     } & OddInfo
     has_score: number
     has_period1_score: number
@@ -402,6 +410,12 @@ const columns: DataTableColumn<OddData>[] = [
                 </NFlex>
             )
         },
+    },
+    {
+        key: 'promote_rule',
+        title: '推荐规则',
+        width: 80,
+        render: (row) => (row.promoted ? PROMOTE_RULE_TEXT[row.promoted.final_rule] : ''),
     },
     {
         key: 'result',
