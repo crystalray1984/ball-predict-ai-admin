@@ -73,7 +73,7 @@ declare type OddStatus = '' | 'ready' | 'promoted' | 'ignored'
 /**
  * 二次比对完成时的规则
  */
-declare type PromotedFinalRule = '' | 'crown' | 'crown_special' | 'titan007'
+declare type PromotedFinalRule = '' | 'crown' | 'crown_special' | 'titan007' | 'special_config'
 
 /**
  * 二次推荐不推荐的原因
