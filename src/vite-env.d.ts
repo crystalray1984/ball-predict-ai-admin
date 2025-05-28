@@ -186,3 +186,38 @@ declare interface AddPromotedOddInfo extends OddInfo {
     odd_id: number
     back: number
 }
+
+declare interface UserConnect {
+    account: string
+}
+
+/**
+ * 用户信息
+ */
+declare interface User {
+    id: number
+    nickname: string
+    avatar: string
+    expire_time: string
+    is_expired: number
+    created_at: string
+    reg_source: string
+    luffa: UserConnect | null
+    status: number
+}
+
+declare interface Order<T = any> {
+    id: number
+    order_number: string
+    user_id: number
+    type: string
+    amount: string
+    currency: string
+    extra: T
+    channel_type: string
+    paid_at: string
+}
+
+interface VipOrderData {
+    type: 'day' | 'week' | 'month' | 'quarter'
+}

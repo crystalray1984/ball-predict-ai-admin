@@ -19,6 +19,14 @@ const menuOptions: MenuOption[] = [
         label: '比赛列表',
     },
     {
+        key: '/users',
+        label: '用户管理',
+    },
+    {
+        key: '/vip_records',
+        label: 'VIP购买记录',
+    },
+    {
         key: '/settings',
         label: '系统设置',
     },

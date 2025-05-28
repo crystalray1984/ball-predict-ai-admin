@@ -8,6 +8,8 @@ import Login from './pages/Login.vue'
 import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
 import Settings from './pages/Settings.vue'
+import Users from './pages/Users.vue'
+import VipRecords from './pages/VipRecords.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -38,6 +40,14 @@ export const router = createRouter({
                 {
                     path: '/settings',
                     component: Settings,
+                },
+                {
+                    path: '/users',
+                    component: Users,
+                },
+                {
+                    path: '/vip_records',
+                    component: VipRecords,
                 },
             ],
         },

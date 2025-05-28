@@ -198,3 +198,23 @@ export function numberWithSymbol(value: string) {
     const dec = Decimal(value)
     return (dec.gt(0) ? '+' : '') + dec.toString()
 }
+
+/**
+ * 用户的注册源
+ */
+export const USER_REG_SOURCE_TEXT: Record<string, string> = {
+    luffa: 'Luffa',
+    '': '管理端添加',
+}
+
+export const VIP_TYPE_TEXT: Record<VipOrderData['type'], string> = {
+    day: '日卡',
+    week: '周卡',
+    month: '月卡',
+    quarter: '季卡',
+}
+
+export const PAY_CHANNEL_TYPE_TEXT: Record<string, string> = {
+    endless: 'EDS正式链',
+    eds: 'EDS测试链',
+}
