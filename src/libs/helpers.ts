@@ -217,4 +217,6 @@ export const VIP_TYPE_TEXT: Record<VipOrderData['type'], string> = {
 export const PAY_CHANNEL_TYPE_TEXT: Record<string, string> = {
     endless: 'EDS正式链',
     eds: 'EDS测试链',
+    tron: '波场',
+    ethereum: '以太坊',
 }
