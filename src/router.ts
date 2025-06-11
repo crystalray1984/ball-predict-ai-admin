@@ -10,6 +10,7 @@ import Odds from './pages/Odds.vue'
 import Settings from './pages/Settings.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
+import ManualPromote from './pages/ManualPromote.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -48,6 +49,10 @@ export const router = createRouter({
                 {
                     path: '/vip_records',
                     component: VipRecords,
+                },
+                {
+                    path: '/manual_promote',
+                    component: ManualPromote,
                 },
             ],
         },

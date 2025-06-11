@@ -1,14 +1,24 @@
 <script setup lang="tsx">
+import ConditionSelect from '@/components/ConditionSelect'
 import MatchScoreSetter from '@/components/MatchScoreSetter.vue'
+import { ActionModal } from '@/components/modal'
 import PageGrid from '@/components/PageGrid.vue'
 import TournamentSelect from '@/components/TournamentSelect'
 import { api } from '@/libs/api'
-import { date, isNullOrUndefined } from '@/libs/helpers'
+import {
+    date,
+    dateTime,
+    isNullOrUndefined,
+    ODD_TYPE_TEXT,
+    PERIOD_TEXT,
+    VARIETY_TEXT,
+} from '@/libs/helpers'
 import { useListLoader } from '@/libs/loader'
 import dayjs from 'dayjs'
 import { trim } from 'lodash-es'
 import {
     NButton,
+    NCol,
     NDataTable,
     NDatePicker,
     NFlex,
@@ -16,7 +26,10 @@ import {
     NFormItem,
     NInput,
     NPagination,
+    NRow,
+    NSelect,
     NTag,
+    useMessage,
     type DataTableColumn,
 } from 'naive-ui'
 import { onMounted, reactive } from 'vue'
@@ -166,6 +179,14 @@ const columns: DataTableColumn<Match>[] = [
                             ),
                         }}
                     </MatchScoreSetter>
+                    <NButton
+                        type="warning"
+                        ghost={true}
+                        size="small"
+                        onClick={() => createSinglePromote(row)}
+                    >
+                        手动推荐
+                    </NButton>
                 </NFlex>
             )
         },
@@ -187,6 +208,60 @@ const reloadMatch = async (id: number) => {
     const index = list.value.findIndex((t) => t.id === id)
     if (index !== -1) {
         list.value.splice(index, 1, ret.data)
+    }
+}
+
+const periodOptions = Object.entries(PERIOD_TEXT).map(([value, label]) => ({ value, label }))
+const varietyOptions = Object.entries(VARIETY_TEXT).map(([value, label]) => ({ value, label }))
+const oddTypeOptions = Object.entries(ODD_TYPE_TEXT)
+    .filter((t) => t[0] !== 'draw')
+    .map(([value, label]) => ({ value, label }))
+
+const singlePromoteModal = reactive({
+    show: false,
+    data: null as unknown as EditingManualPromoteOdd,
+    match: null as unknown as Match,
+    sending: false,
+})
+
+/**
+ * 创建单场推荐
+ */
+const createSinglePromote = (match: Match) => {
+    singlePromoteModal.match = match
+    singlePromoteModal.data = {
+        match_id: match.id,
+        variety: 'goal',
+        period: 'regularTime',
+        type: 'ah1',
+        condition: '0',
+        type2: null,
+        condition2: null,
+    }
+    singlePromoteModal.show = true
+}
+
+const message = useMessage()
+
+/**
+ * 提交单场推荐
+ */
+const submitSinglePromote = async () => {
+    //创建推荐
+    singlePromoteModal.sending = true
+    const ret = await api({
+        url: '/admin/manual_promote/create',
+        data: {
+            type: 'single',
+            odds: [singlePromoteModal.data],
+        },
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+        singlePromoteModal.sending = false
+    } else {
+        message.success('添加推荐成功')
+        singlePromoteModal.sending = singlePromoteModal.show = false
     }
 }
 </script>
@@ -236,5 +311,67 @@ const reloadMatch = async (id: number) => {
             <NPagination v-bind="pagination" />
         </template>
     </PageGrid>
+
+    <ActionModal
+        title="添加手动推荐"
+        v-model:show="singlePromoteModal.show"
+        :data="singlePromoteModal.data"
+        :sending="singlePromoteModal.sending"
+        :style="{ width: '600px' }"
+        @positiveClick="submitSinglePromote"
+    >
+        <NForm
+            labelPlacement="left"
+            labelWidth="80px"
+            :disabled="singlePromoteModal.sending"
+            :showFeedback="false"
+        >
+            <NFlex :vertical="true" size="large">
+                <NFormItem label="比赛时间">{{
+                    dateTime(singlePromoteModal.match.match_time)
+                }}</NFormItem>
+                <NFormItem label="对阵球队"
+                    >{{ singlePromoteModal.match.team1.name }} vs
+                    {{ singlePromoteModal.match.team2.name }}</NFormItem
+                >
+                <NRow :gutter="12">
+                    <NCol :span="12">
+                        <NFormItem label="时段">
+                            <NSelect
+                                v-model:value="singlePromoteModal.data.period"
+                                :options="periodOptions"
+                            />
+                        </NFormItem>
+                    </NCol>
+                    <NCol :span="12">
+                        <NFormItem label="玩法">
+                            <NSelect
+                                v-model:value="singlePromoteModal.data.variety"
+                                :options="varietyOptions"
+                            />
+                        </NFormItem>
+                    </NCol>
+                </NRow>
+                <NRow :gutter="12">
+                    <NCol :span="12">
+                        <NFormItem label="方向">
+                            <NSelect
+                                v-model:value="singlePromoteModal.data.type"
+                                :options="oddTypeOptions"
+                            />
+                        </NFormItem>
+                    </NCol>
+                    <NCol :span="12">
+                        <NFormItem label="盘口">
+                            <ConditionSelect
+                                v-model:value="singlePromoteModal.data.condition"
+                                :oddType="singlePromoteModal.data.type"
+                            />
+                        </NFormItem>
+                    </NCol>
+                </NRow>
+            </NFlex>
+        </NForm>
+    </ActionModal>
 </template>
 <style lang="less" scoped></style>

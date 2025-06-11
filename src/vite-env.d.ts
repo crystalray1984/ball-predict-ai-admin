@@ -221,3 +221,45 @@ declare interface Order<T = any> {
 interface VipOrderData {
     type: 'day' | 'week' | 'month' | 'quarter'
 }
+
+/**
+ * 手动推荐记录
+ */
+interface ManualPromoteRecord {
+    id: number
+    type: 'single' | 'chain'
+    odds: []
+}
+
+/**
+ * 手动推荐的盘口
+ */
+interface ManualPromoteOdd extends OddInfo {
+    id: number
+    record_id: number
+    match_id: number
+    match_time: string
+    tournament: Tournament
+    team1: Team
+    team2: Team
+    promoted?: {
+        id: number
+        result: {
+            result: number
+            score: string
+        } | null
+        back: number
+        score: string
+    } & OddInfo
+    has_score: number
+    has_period1_score: number
+    type2?: string | null
+    condition2?: string | null
+    promoted_odd_id: number
+}
+
+interface EditingManualPromoteOdd extends OddInfo {
+    match_id: number
+    type2?: string | null
+    condition2?: string | null
+}

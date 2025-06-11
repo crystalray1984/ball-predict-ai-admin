@@ -15,6 +15,10 @@ const menuOptions: MenuOption[] = [
         label: '盘口数据',
     },
     {
+        key: '/manual_promote',
+        label: '手动推荐',
+    },
+    {
         key: '/matches',
         label: '比赛列表',
     },
