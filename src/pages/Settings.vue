@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import AdjustConditionEditor from '@/components/AdjustConditionEditor.vue'
+import DirectConfigEditor from '@/components/DirectConfigEditor.vue'
 import SpecialConfigEditor from '@/components/SpecialConfigEditor.vue'
 import SpecialEnableEditor from '@/components/SpecialEnableEditor.vue'
 import SpecialReverseEditor from '@/components/SpecialReverseEditor.vue'
@@ -78,6 +79,14 @@ const saveSettings = async () => {
                         :disabled="loading"
                     >
                         <NFlex :vertical="true" size="large">
+                            <NFormItem label="角球准备中">
+                                <NRadioGroup v-model:value="settings.allow_corner_preparing">
+                                    <NFlex size="large">
+                                        <NRadio :value="true">开启</NRadio>
+                                        <NRadio :value="false">关闭</NRadio>
+                                    </NFlex>
+                                </NRadioGroup>
+                            </NFormItem>
                             <NFormItem label="筛选率">
                                 <NRadioGroup v-model:value="settings.filter_rate">
                                     <NFlex size="large">
@@ -211,6 +220,18 @@ const saveSettings = async () => {
                                     />
                                     <span>
                                         规则越靠前，优先级越高，一旦触发一个规则则不再触发另一个
+                                    </span>
+                                </NFlex>
+                            </NFormItem>
+                            <NFormItem label="推送直通规则">
+                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
+                                    <DirectConfigEditor
+                                        :list="settings.direct_config"
+                                        :disabled="loading"
+                                    />
+                                    <span>
+                                        规则越靠前，优先级越高，一旦触发一个规则就直接进入推荐<br />
+                                        满足推送直通规则的不会受后续的二次判断和推荐规则影响
                                     </span>
                                 </NFlex>
                             </NFormItem>

@@ -153,6 +153,10 @@ declare interface Setting {
     adjust_condition: AdjustCondition[]
 
     special_config: SpecialConfig[]
+
+    direct_config: DirectConfig[]
+
+    allow_corner_preparing: boolean
 }
 
 declare interface SpecialConfig {
@@ -180,6 +184,16 @@ declare interface SpecialReverse extends SpecialEnable {
 
 declare interface AdjustCondition extends SpecialEnable {
     adjust: string
+}
+
+/**
+ * 直通推荐配置
+ */
+declare interface DirectConfig extends SpecialEnable {
+    back: boolean
+    adjust: string
+    value_symbol?: '>=' | '>' | '<=' | '<' | '='
+    value: string
 }
 
 declare interface AddPromotedOddInfo extends OddInfo {

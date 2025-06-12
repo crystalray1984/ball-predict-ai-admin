@@ -19,6 +19,8 @@ import {
     NInputGroup,
     NSelect,
     useMessage,
+    NRadioGroup,
+    NRadio,
     type DataTableColumn,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
@@ -28,7 +30,7 @@ import { ActionModal } from './modal'
 
 const props = defineProps({
     list: {
-        type: Array as PropType<AdjustCondition[]>,
+        type: Array as PropType<DirectConfig[]>,
         required: true,
     },
     disabled: {
@@ -51,34 +53,59 @@ const remove = (index: number) => {
     props.list.splice(index, 1)
 }
 
-const columns: DataTableColumn<AdjustCondition>[] = [
+const columns: DataTableColumn<DirectConfig>[] = [
     {
-        key: 'period',
-        title: '时段',
-        render: (row) => (row.period ? PERIOD_TEXT[row.period] : '-'),
+        key: 'row_condition',
+        title: '条件',
+        children: [
+            {
+                key: 'period',
+                title: '时段',
+                render: (row) => (row.period ? PERIOD_TEXT[row.period] : '-'),
+            },
+            {
+                key: 'variety',
+                title: '玩法',
+                render: (row) => (row.variety ? VARIETY_TEXT[row.variety] : '-'),
+            },
+            {
+                key: 'type',
+                title: '方向',
+                render: (row) => (row.type ? ODD_TYPE_TEXT[row.type] : '-'),
+            },
+            {
+                key: 'condition',
+                title: '盘口',
+                render: (row) =>
+                    !isNullOrUndefined(row.condition_symbol) && !isNullOrUndefined(row.condition)
+                        ? `${row.condition_symbol} ${row.condition}`
+                        : '-',
+            },
+            // {
+            //     key: 'value',
+            //     title: '水位',
+            //     render: (row) =>
+            //         !isNullOrUndefined(row.value_symbol) && !isNullOrUndefined(row.value)
+            //             ? `${row.value_symbol} ${row.value}`
+            //             : '-',
+            // },
+        ],
     },
     {
-        key: 'variety',
-        title: '玩法',
-        render: (row) => (row.variety ? VARIETY_TEXT[row.variety] : '-'),
-    },
-    {
-        key: 'type',
-        title: '方向',
-        render: (row) => (row.type ? ODD_TYPE_TEXT[row.type] : '-'),
-    },
-    {
-        key: 'condition',
-        title: '盘口',
-        render: (row) =>
-            !isNullOrUndefined(row.condition_symbol) && !isNullOrUndefined(row.condition)
-                ? `${row.condition_symbol} ${row.condition}`
-                : '-',
-    },
-    {
-        key: 'adjust',
-        title: '变盘',
-        render: (row) => numberWithSymbol(row.adjust),
+        key: 'row_action',
+        title: '行为',
+        children: [
+            {
+                key: 'back',
+                title: '方向',
+                render: (row) => (row.back ? '反推' : '正推'),
+            },
+            {
+                key: 'adjust',
+                title: '变盘',
+                render: (row) => numberWithSymbol(row.adjust),
+            },
+        ],
     },
     {
         key: 'actions',
@@ -132,7 +159,7 @@ const columns: DataTableColumn<AdjustCondition>[] = [
 
 const addModal = reactive({
     show: false,
-    data: null as unknown as AdjustCondition,
+    data: null as unknown as DirectConfig,
 })
 
 const periodOptions = Object.entries(PERIOD_TEXT).map(([value, label]) => ({ value, label }))
@@ -145,10 +172,6 @@ const adjustOptions = (() => {
     let start = Decimal('-10')
     const output: { value: string; label: string }[] = []
     while (start.lte(10)) {
-        if (start.eq(0)) {
-            start = start.add('0.25')
-            continue
-        }
         const value = start.toString()
         const label = numberWithSymbol(value)
         output.push({ value, label })
@@ -163,8 +186,10 @@ const adjustOptions = (() => {
 const add = () => {
     addModal.data = {
         id: nanoid(),
-        adjust: '0.25',
+        adjust: '0',
         condition: '0',
+        back: false,
+        value: '0',
     }
     addModal.show = true
 }
@@ -226,7 +251,7 @@ const submitAdd = () => {
             添加规则
         </NButton>
         <ActionModal
-            title="添加推荐变盘规则"
+            title="添加推荐直通规则"
             v-model:show="addModal.show"
             :data="addModal.data"
             :style="{ width: '400px' }"
@@ -250,7 +275,7 @@ const submitAdd = () => {
                             placeholder="不限"
                         />
                     </NFormItem>
-                    <NFormItem label="盘口方向">
+                    <NFormItem label="原始方向">
                         <NSelect
                             v-model:value="addModal.data.type"
                             :options="oddTypeOptions"
@@ -258,7 +283,7 @@ const submitAdd = () => {
                             placeholder="不限"
                         />
                     </NFormItem>
-                    <NFormItem label="盘口条件">
+                    <NFormItem label="原始条件">
                         <NInputGroup>
                             <NSelect
                                 v-model:value="addModal.data.condition_symbol"
@@ -279,7 +304,15 @@ const submitAdd = () => {
                             />
                         </NInputGroup>
                     </NFormItem>
-                    <NFormItem label="变盘">
+                    <NFormItem label="推荐方向">
+                        <NRadioGroup v-model:value="addModal.data.back">
+                            <NFlex size="large">
+                                <NRadio :value="false">正推</NRadio>
+                                <NRadio :value="true">反推</NRadio>
+                            </NFlex>
+                        </NRadioGroup>
+                    </NFormItem>
+                    <NFormItem label="推荐变盘">
                         <NSelect v-model:value="addModal.data.adjust" :options="adjustOptions" />
                     </NFormItem>
                 </NFlex>
