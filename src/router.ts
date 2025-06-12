@@ -5,12 +5,13 @@ import { token } from '@/libs/token'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import Dashboard from './pages/Dashboard.vue'
 import Login from './pages/Login.vue'
+import ManualPromote from './pages/ManualPromote.vue'
 import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
 import Settings from './pages/Settings.vue'
+import SurebetRecords from './pages/SurebetRecords.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
-import ManualPromote from './pages/ManualPromote.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -53,6 +54,10 @@ export const router = createRouter({
                 {
                     path: '/manual_promote',
                     component: ManualPromote,
+                },
+                {
+                    path: '/surebet_records',
+                    component: SurebetRecords,
                 },
             ],
         },

@@ -195,9 +195,9 @@ const remove = async (id: number, odd_id?: number) => {
                 <NFormItem>
                     <NButton type="primary" :loading="loading" @click="applyFilter">刷新</NButton>
                 </NFormItem>
-                <NFormItem>
+                <!-- <NFormItem>
                     <NButton type="warning">添加推荐</NButton>
-                </NFormItem>
+                </NFormItem> -->
             </NForm>
         </template>
         <div class="list">
