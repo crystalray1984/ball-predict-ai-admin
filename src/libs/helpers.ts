@@ -33,6 +33,7 @@ export const FINAL_RULE_TEXT: Record<PromotedFinalRule, string> = {
     crown: '水位',
     crown_special: '变盘',
     special_config: '特殊',
+    direct: '推送直通',
 }
 
 export const PROMOTE_RULE_TEXT: Record<string, string> = {
