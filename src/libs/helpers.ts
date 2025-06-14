@@ -41,6 +41,7 @@ export const PROMOTE_RULE_TEXT: Record<string, string> = {
     special: '特殊',
     special_config: '变盘',
     corner: '角球',
+    direct: '推送直通',
 }
 
 export function date(input: ConfigType, format = 'YYYY-MM-DD') {
