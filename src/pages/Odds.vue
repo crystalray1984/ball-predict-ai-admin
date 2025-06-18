@@ -24,6 +24,7 @@ import {
     NForm,
     NFormItem,
     NSelect,
+    NSwitch,
     NTag,
     NText,
     useMessage,
@@ -72,6 +73,8 @@ interface OddData extends OddInfo {
     has_period1_score: number
     created_at: string
     ready_at: string | null
+    is_open: number
+    is_updating?: boolean
 }
 
 const start = dayjs().subtract(2, 'day').startOf('day')
@@ -229,6 +232,19 @@ const removePromote = async (odd: OddData) => {
     close()
 }
 
+const onToggleOpen = async (item: OddData, is_open: number) => {
+    item.is_updating = true
+    await api({
+        url: '/admin/odd/toggle_open',
+        data: {
+            id: item.id,
+            is_open,
+        },
+    })
+    item.is_open = 1 - item.is_open
+    item.is_updating = false
+}
+
 const columns: DataTableColumn<OddData>[] = [
     {
         key: 'match_time',
@@ -355,6 +371,24 @@ const columns: DataTableColumn<OddData>[] = [
         render: (row) => {
             if (row.status !== 'promoted') return
             return FINAL_RULE_TEXT[row.final_rule]
+        },
+    },
+    {
+        key: 'is_open',
+        title: '开启',
+        width: 60,
+        align: 'center',
+        render: (row) => {
+            return (
+                <NSwitch
+                    size="small"
+                    value={row.is_open}
+                    checkedValue={1}
+                    uncheckedValue={0}
+                    loading={row.is_updating}
+                    onUpdateValue={(value) => onToggleOpen(row, value)}
+                />
+            )
         },
     },
     {

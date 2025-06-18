@@ -10,6 +10,7 @@ import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
 import Settings from './pages/Settings.vue'
 import SurebetRecords from './pages/SurebetRecords.vue'
+import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
 
@@ -58,6 +59,10 @@ export const router = createRouter({
                 {
                     path: '/surebet_records',
                     component: SurebetRecords,
+                },
+                {
+                    path: '/tournaments',
+                    component: Tournaments,
                 },
             ],
         },

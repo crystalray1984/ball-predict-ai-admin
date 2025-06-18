@@ -23,6 +23,10 @@ const menuOptions: MenuOption[] = [
         label: '比赛列表',
     },
     {
+        key: '/tournaments',
+        label: '赛事列表',
+    },
+    {
         key: '/surebet_records',
         label: '推送记录',
     },

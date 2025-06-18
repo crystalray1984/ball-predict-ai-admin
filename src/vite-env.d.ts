@@ -23,6 +23,8 @@ declare interface Admin {
 declare interface Tournament {
     id: number
     name: string
+    is_open: number
+    is_updating?: boolean
 }
 
 declare interface Team {
