@@ -45,6 +45,7 @@ const columns: DataTableColumn<ManualPromoteOdd>[] = [
     {
         key: 'tournament.name',
         title: '联赛',
+        width: '30%',
     },
     {
         key: 'team',
