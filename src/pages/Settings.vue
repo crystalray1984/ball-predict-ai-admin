@@ -180,10 +180,11 @@ const saveSettings = async () => {
                             </NFormItem>
 
                             <NFormItem label="推荐方向:趋势">
-                                <NRadioGroup v-model:value="settings.titan007_reverse">
+                                <NRadioGroup v-model:value="settings.titan007_promote_enable">
                                     <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
+                                        <NRadio :value="1">开启:跟随趋势</NRadio>
+                                        <NRadio :value="-1">开启:反向趋势</NRadio>
+                                        <NRadio :value="0">关闭</NRadio>
                                     </NFlex>
                                 </NRadioGroup>
                             </NFormItem>

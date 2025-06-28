@@ -144,6 +144,7 @@ declare interface Setting {
     period1_enable: boolean
     promote_reverse: boolean
     titan007_reverse: boolean
+    titan007_promote_enable: number
 
     filter_rate: number
     min_surebet_value: string
