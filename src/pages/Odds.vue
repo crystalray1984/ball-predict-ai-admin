@@ -6,6 +6,7 @@ import { api } from '@/libs/api'
 import {
     dateTime,
     FINAL_RULE_TEXT,
+    getReverseOdd,
     ODD_TYPE_TEXT,
     PERIOD_TEXT,
     PROMOTE_RULE_TEXT,
@@ -286,6 +287,24 @@ const columns: DataTableColumn<OddData>[] = [
         title: '玩法',
         width: 50,
         render: (row) => VARIETY_TEXT[row.variety],
+    },
+    {
+        key: 'precalc_odd',
+        title: '预推盘口',
+        width: 80,
+        render: (row) => {
+            const { type, condition } = getReverseOdd(row)
+
+            const texts: string[] = []
+            texts.push(ODD_TYPE_TEXT[type])
+            if (['ah1', 'ah2'].includes(type)) {
+                const _condition = Decimal(condition)
+                texts.push(`${_condition.gt(0) ? '+' : ''}${_condition.toString()}`)
+            } else if (['over', 'under'].includes(type)) {
+                texts.push(Decimal(condition).toString())
+            }
+            return texts.join(' ')
+        },
     },
     {
         key: 'odd',
