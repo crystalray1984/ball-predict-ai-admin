@@ -5,6 +5,7 @@ import {
     ODD_TYPE_TEXT,
     PERIOD_TEXT,
     VARIETY_TEXT,
+    PUBLISH_CHANNELS,
 } from '@/libs/helpers'
 import { ArrowDownOutlined, ArrowUpOutlined, CloseCircleOutlined } from '@vicons/antd'
 import Decimal from 'decimal.js'
@@ -22,6 +23,8 @@ import {
     NRadioGroup,
     NRadio,
     type DataTableColumn,
+    NCheckbox,
+    NCheckboxGroup,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
 import { reactive, type PropType } from 'vue'
@@ -81,6 +84,11 @@ const columns: DataTableColumn<DirectConfig>[] = [
                         ? `${row.condition_symbol} ${row.condition}`
                         : '-',
             },
+            {
+                key: 'first_check',
+                title: '一次比对',
+                render: (row) => (row.first_check ? '需要' : ''),
+            },
             // {
             //     key: 'value',
             //     title: '水位',
@@ -104,6 +112,11 @@ const columns: DataTableColumn<DirectConfig>[] = [
                 key: 'adjust',
                 title: '变盘',
                 render: (row) => numberWithSymbol(row.adjust),
+            },
+            {
+                key: 'publish_channels',
+                title: '推送',
+                render: (row) => row.publish_channels.map((channel) => PUBLISH_CHANNELS[channel]),
             },
         ],
     },
@@ -190,6 +203,8 @@ const add = () => {
         condition: '0',
         back: false,
         value: '0',
+        first_check: true,
+        publish_channels: ['channel1'],
     }
     addModal.show = true
 }
@@ -219,6 +234,12 @@ const submitAdd = () => {
 
     if (exists) {
         message.warning('已经存在相同条件的规则')
+        return
+    }
+
+    //通道检查
+    if (addModal.data.publish_channels.length === 0) {
+        message.warning('需要选择至少1个推送通道')
         return
     }
 
@@ -304,6 +325,9 @@ const submitAdd = () => {
                             />
                         </NInputGroup>
                     </NFormItem>
+                    <NFormItem label="一次比对">
+                        <NCheckbox v-model:checked="addModal.data.first_check">需要</NCheckbox>
+                    </NFormItem>
                     <NFormItem label="推荐方向">
                         <NRadioGroup v-model:value="addModal.data.back">
                             <NFlex size="large">
@@ -314,6 +338,17 @@ const submitAdd = () => {
                     </NFormItem>
                     <NFormItem label="推荐变盘">
                         <NSelect v-model:value="addModal.data.adjust" :options="adjustOptions" />
+                    </NFormItem>
+                    <NFormItem label="推送通道">
+                        <NCheckboxGroup v-model:value="addModal.data.publish_channels">
+                            <NCheckbox
+                                v-for="(name, key) in PUBLISH_CHANNELS"
+                                :key="key"
+                                :value="key"
+                            >
+                                {{ name }}
+                            </NCheckbox>
+                        </NCheckboxGroup>
                     </NFormItem>
                 </NFlex>
             </NForm>

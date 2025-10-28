@@ -44,6 +44,14 @@ export const PROMOTE_RULE_TEXT: Record<string, string> = {
     direct: '推送直通',
 }
 
+/**
+ * 推送通道
+ */
+export const PUBLISH_CHANNELS: Record<string, string> = {
+    channel1: '通道1',
+    channel2: '通道2',
+}
+
 export function date(input: ConfigType, format = 'YYYY-MM-DD') {
     if (typeof input === 'undefined' || input === null) return ''
     return dayjs(input).format(format)

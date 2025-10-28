@@ -199,10 +199,15 @@ declare interface AdjustCondition extends SpecialEnable {
  * 直通推荐配置
  */
 declare interface DirectConfig extends SpecialEnable {
+    /**
+     * 是否需要一次比对，默认为true
+     */
+    first_check: boolean
     back: boolean
     adjust: string
     value_symbol?: '>=' | '>' | '<=' | '<' | '='
     value: string
+    publish_channels: string[]
 }
 
 declare interface AddPromotedOddInfo extends OddInfo {
