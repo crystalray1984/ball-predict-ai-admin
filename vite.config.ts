@@ -23,12 +23,12 @@ export default defineConfig({
         proxy: {
             '/api/': {
                 target: 'http://127.0.0.1:8000',
-                // target: 'https://v2.188zq.vip',
+                // target: 'https://v3.188zq.vip',
                 changeOrigin: true,
             },
             '/admin/': {
                 target: 'http://127.0.0.1:8000',
-                // target: 'https://v2.188zq.vip',
+                // target: 'https://v3.188zq.vip',
                 changeOrigin: true,
             },
         },

@@ -29,33 +29,67 @@ const columns = computed<DataTableColumn<CrownOdd>[]>(() => [
         title: '时间',
         align: 'center',
         width: 80,
+        cellProps: (row) => {
+            if (row.promote_flag > 0) {
+                return {
+                    style: {
+                        backgroundColor: 'rgb(18,72,61)',
+                    },
+                }
+            } else {
+                return {}
+            }
+        },
         render: (row) => dayjs(row.created_at).format('HH:mm:ss'),
     },
     {
         key: 'value1',
         title: props.type === 'ah' ? '主队' : '小球',
         align: 'center',
-        render: (row) => (
-            <NText type={row.promote_flag ? 'error' : undefined}>{Number(row.value1)}</NText>
-        ),
+        cellProps: (row) => {
+            if (row.promote_flag === 1) {
+                return {
+                    style: {
+                        backgroundColor: 'rgb(18,72,61)',
+                    },
+                }
+            } else {
+                return {}
+            }
+        },
+        render: (row) => Number(row.value1),
     },
     {
         key: 'condition',
         title: '盘口',
         align: 'center',
+
         render: (row) => {
+            let text = ''
             if (props.type === 'ah') {
                 const condition = Decimal(row.condition)
-                return `${condition.gt(0) ? '+' : ''}${condition.toString()}`
+                text = `${condition.gt(0) ? '+' : ''}${condition.toString()}`
             } else {
-                return Decimal(row.condition).toString()
+                text = Decimal(row.condition).toString()
             }
+            return text
         },
     },
     {
         key: 'value2',
         title: props.type === 'ah' ? '客队' : '大球',
         align: 'center',
+        cellProps: (row) => {
+            if (row.promote_flag === 2) {
+                return {
+                    style: {
+                        backgroundColor: 'rgb(18,72,61)',
+                    },
+                }
+            } else {
+                return {}
+            }
+        },
         render: (row) => Number(row.value2),
     },
 ])

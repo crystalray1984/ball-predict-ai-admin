@@ -22,6 +22,9 @@ import {
     type DataTableColumn,
 } from 'naive-ui'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, type Ref } from 'vue'
+import duration from 'dayjs/plugin/duration'
+
+dayjs.extend(duration)
 
 interface Filter {
     tournament_id?: number
@@ -295,6 +298,19 @@ const columns = computed<DataTableColumn<OddDataRow>[]>(() => [
         render: (row) => {
             if (!row.promoted || !row.promoted.end_odd_data) return
             return Number(row.promoted.end_odd_data.value)
+        },
+    },
+    {
+        key: 'end_time_elasped',
+        title: '距离开赛',
+        width: 70,
+        align: 'center',
+        render: (row) => {
+            if (!row.promoted || !row.promoted.end_odd_data) return
+            const duration = dayjs.duration(
+                dayjs(row.main.match_time).valueOf() - row.promoted.end_odd_data.time,
+            )
+            return `${duration.hours()}:${duration.minutes().toString().padStart(2, '0')}`
         },
     },
     {
