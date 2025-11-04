@@ -78,7 +78,7 @@ interface OddData extends OddInfo {
     is_updating?: boolean
 }
 
-const start = dayjs().subtract(2, 'day').startOf('day')
+const start = dayjs().subtract(1, 'day').startOf('day')
 const end = dayjs().add(1, 'day').startOf('day')
 const message = useMessage()
 

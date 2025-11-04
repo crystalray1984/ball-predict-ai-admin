@@ -14,6 +14,7 @@ import {
     NForm,
     NFormItem,
     NPagination,
+    NScrollbar,
     NTag,
     NText,
     useMessage,
@@ -201,38 +202,50 @@ const remove = async (id: number, odd_id?: number) => {
                 </NFormItem> -->
             </NForm>
         </template>
-        <div class="list">
-            <NCard
-                v-for="record in list"
-                :key="record.id"
-                size="small"
-                :contentStyle="{ padding: 0 }"
-            >
-                <template #header>
-                    #{{ record.id }}
-                    <span v-if="record.type === 'single'">单场推荐</span>
-                    <span v-else-if="record.type === 'chain'">串场推荐</span>
-                </template>
-                <NDataTable
-                    :data="record.odds"
-                    :rowKey="(t) => t.id"
-                    :columns="columns"
-                    :pagination="false"
-                    size="small"
-                    :striped="true"
-                    :bordered="false"
-                    :singleLine="false"
-                />
-            </NCard>
+        <div class="list-container">
+            <NScrollbar>
+                <div class="list">
+                    <NCard
+                        v-for="record in list"
+                        :key="record.id"
+                        size="small"
+                        :contentStyle="{ padding: 0 }"
+                    >
+                        <template #header>
+                            #{{ record.id }}
+                            <span v-if="record.type === 'single'">单场推荐</span>
+                            <span v-else-if="record.type === 'chain'">串场推荐</span>
+                        </template>
+                        <NDataTable
+                            :data="record.odds"
+                            :rowKey="(t) => t.id"
+                            :columns="columns"
+                            :pagination="false"
+                            size="small"
+                            :striped="true"
+                            :bordered="false"
+                            :singleLine="false"
+                        />
+                    </NCard>
+                </div>
+            </NScrollbar>
         </div>
+
         <template #footer>
             <NPagination v-bind="pagination" />
         </template>
     </PageGrid>
 </template>
 <style lang="less" scoped>
+.list-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 .list {
     padding: 0 12px;
+    position: relative;
 
     .n-card + .n-card {
         margin-top: 12px;

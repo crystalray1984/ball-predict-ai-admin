@@ -166,6 +166,12 @@ declare interface Setting {
     direct_config: DirectConfig[]
 
     allow_corner_preparing: boolean
+
+    v3_check_max_duration: number
+    v3_check_max_value: string
+    v3_check_min_duration: number
+    v3_check_min_value: string
+    v3_check_min_promote_value: string
 }
 
 declare interface SpecialConfig {
@@ -290,4 +296,17 @@ interface EditingManualPromoteOdd extends OddInfo {
     match_id: number
     type2?: string | null
     condition2?: string | null
+}
+
+declare interface CrownOdd {
+    id: number
+    variety: Variety
+    period: Period
+    type: 'ah' | 'sum'
+    condition: string
+    value1: string
+    value2: string
+    created_at: string
+    is_ignored: number
+    promote_flag: number
 }

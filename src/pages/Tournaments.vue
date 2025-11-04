@@ -9,6 +9,7 @@ import {
     NForm,
     NFormItem,
     NInput,
+    NSelect,
     NSwitch,
     type DataTableColumn,
 } from 'naive-ui'
@@ -16,18 +17,26 @@ import { onMounted, reactive, ref, type Ref } from 'vue'
 
 const filter = reactive({
     name: '',
+    order: 'name:asc',
 })
 
 const { load, loading } = useLoader()
 const list = ref([]) as Ref<Tournament[]>
 
 const applyFilter = async () => {
+    const data: Record<string, any> = {
+        name: trim(filter.name),
+    }
+    if (filter.order) {
+        const [order_field, order_order] = filter.order.split(':')
+        data.order_field = order_field
+        data.order_order = order_order
+    }
+
     const ret = await load(() =>
         api<Tournament[]>({
             url: '/admin/match/tournament_list',
-            data: {
-                name: trim(filter.name),
-            },
+            data,
         }),
     )
     list.value = ret.data ?? []
@@ -72,6 +81,20 @@ const columns: DataTableColumn<Tournament>[] = [
         ),
     },
 ]
+
+/**
+ * 排序顺序
+ */
+const orderOptions = [
+    {
+        value: 'name:asc',
+        label: '比赛名称',
+    },
+    {
+        value: 'id:desc',
+        label: '创建时间',
+    },
+]
 </script>
 <template>
     <PageGrid :useContentScroller="false">
@@ -79,6 +102,13 @@ const columns: DataTableColumn<Tournament>[] = [
             <NForm labelPlacement="left" :inline="true" :showFeedback="false" :disabled="loading">
                 <NFormItem label="赛事名称筛选">
                     <NInput v-model:value="filter.name" />
+                </NFormItem>
+                <NFormItem label="排序顺序">
+                    <NSelect
+                        v-model:value="filter.order"
+                        :options="orderOptions"
+                        :consistentMenuWidth="false"
+                    />
                 </NFormItem>
                 <NButton type="primary" :loading="loading" @click="applyFilter">查询</NButton>
             </NForm>

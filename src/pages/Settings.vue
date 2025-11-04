@@ -1,9 +1,5 @@
 <script setup lang="tsx">
-import AdjustConditionEditor from '@/components/AdjustConditionEditor.vue'
 import DirectConfigEditor from '@/components/DirectConfigEditor.vue'
-import SpecialConfigEditor from '@/components/SpecialConfigEditor.vue'
-import SpecialEnableEditor from '@/components/SpecialEnableEditor.vue'
-import SpecialReverseEditor from '@/components/SpecialReverseEditor.vue'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
 import { pick } from 'lodash-es'
@@ -18,10 +14,7 @@ import {
     NInputGroup,
     NInputGroupLabel,
     NInputNumber,
-    NRadio,
-    NRadioGroup,
     NRow,
-    NSelect,
     useMessage,
 } from 'naive-ui'
 import { onMounted, ref, type Ref } from 'vue'
@@ -79,31 +72,13 @@ const saveSettings = async () => {
                         :disabled="loading"
                     >
                         <NFlex :vertical="true" size="large">
-                            <NFormItem label="角球准备中">
-                                <NRadioGroup v-model:value="settings.allow_corner_preparing">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="筛选率">
-                                <NRadioGroup v-model:value="settings.filter_rate">
-                                    <NFlex size="large">
-                                        <NRadio :value="1">25%</NRadio>
-                                        <NRadio :value="2">50%</NRadio>
-                                        <NRadio :value="3">75%</NRadio>
-                                        <NRadio :value="4">100%</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
                             <NFormItem label="一次比对:水位差">
-                                <NInputGroup>
+                                <NInputGroup :style="{ width: '200px' }">
                                     <NInputGroupLabel>≥</NInputGroupLabel>
                                     <NInput v-model:value="settings.ready_condition" />
                                 </NInputGroup>
                             </NFormItem>
-                            <NFormItem label="二次比对时间">
+                            <NFormItem label="停止追踪时间">
                                 <NFlex align="center">
                                     <NInputNumber
                                         v-model:value="settings.final_check_time"
@@ -114,126 +89,38 @@ const saveSettings = async () => {
                                     <span>分钟</span>
                                 </NFlex>
                             </NFormItem>
-                            <NFormItem label="二次比对:变盘">
-                                <NRadioGroup v-model:value="settings.allow_promote_1">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-
-                            <NFormItem v-if="settings.allow_promote_1" label="变盘配置">
-                                <SpecialConfigEditor
-                                    :list="settings.special_config"
-                                    :disabled="loading"
-                                />
-                            </NFormItem>
-
-                            <NFormItem label="二次比对:水位差">
-                                <NInputGroup>
-                                    <NSelect
-                                        v-model:value="settings.promote_symbol"
-                                        :options="[
-                                            { value: '>=', label: '≥' },
-                                            { value: '<=', label: '≤' },
-                                        ]"
+                            <NFormItem label="追踪目标">
+                                <NFlex align="center">
+                                    <NInputNumber
+                                        v-model:value="settings.v3_check_max_duration"
                                         :style="{ width: '100px' }"
                                     />
-                                    <NInput v-model:value="settings.promote_condition" />
-                                </NInputGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐:半场">
-                                <NRadioGroup v-model:value="settings.period1_enable">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐:角球">
-                                <NRadioGroup v-model:value="settings.corner_enable">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐:半场角球">
-                                <NRadioGroup v-model:value="settings.corner_period1_enable">
-                                    <NFlex size="large">
-                                        <NRadio :value="true">开启</NRadio>
-                                        <NRadio :value="false">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐:特殊规则">
-                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <SpecialEnableEditor
-                                        :list="settings.special_enable"
-                                        :disabled="loading"
+                                    <span>分钟内水位下降达到</span>
+                                    <NInput
+                                        v-model:value="settings.v3_check_max_value"
+                                        :style="{ width: '100px' }"
                                     />
-                                    <span
-                                        >满足任一规则，则忽略"推荐:半场","推荐:角球"和"推荐:半场角球"，直接进入推荐</span
-                                    >
                                 </NFlex>
                             </NFormItem>
-
-                            <NFormItem label="推荐方向:趋势">
-                                <NRadioGroup v-model:value="settings.titan007_promote_enable">
-                                    <NFlex size="large">
-                                        <NRadio :value="1">开启:跟随趋势</NRadio>
-                                        <NRadio :value="-1">开启:反向趋势</NRadio>
-                                        <NRadio :value="0">关闭</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐方向:角球">
-                                <NRadioGroup v-model:value="settings.corner_reverse">
-                                    <NFlex size="large">
-                                        <NRadio :value="false">正推</NRadio>
-                                        <NRadio :value="true">反推</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐方向:全局">
-                                <NRadioGroup v-model:value="settings.promote_reverse">
-                                    <NFlex size="large">
-                                        <NRadio :value="false">正推</NRadio>
-                                        <NRadio :value="true">反推</NRadio>
-                                    </NFlex>
-                                </NRadioGroup>
-                            </NFormItem>
-                            <NFormItem label="推荐方向:特殊">
-                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <SpecialReverseEditor
-                                        :list="settings.special_reverse"
-                                        :disabled="loading"
+                            <NFormItem label="异常下降排除">
+                                <NFlex align="center">
+                                    <NInputNumber
+                                        v-model:value="settings.v3_check_min_duration"
+                                        :style="{ width: '100px' }"
                                     />
-                                    <span>规则越靠前，优先级越高</span>
+                                    <span>分钟内水位下降达到</span>
+                                    <NInput
+                                        v-model:value="settings.v3_check_min_value"
+                                        :style="{ width: '100px' }"
+                                    />
                                 </NFlex>
                             </NFormItem>
-                            <NFormItem label="自动变盘规则">
-                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <AdjustConditionEditor
-                                        :list="settings.adjust_condition"
-                                        :disabled="loading"
+                            <NFormItem label="推送水位条件">
+                                <NFlex align="center">
+                                    <NInput
+                                        v-model:value="settings.v3_check_min_promote_value"
+                                        :style="{ width: '100px' }"
                                     />
-                                    <span>
-                                        规则越靠前，优先级越高，一旦触发一个规则则不再触发另一个
-                                    </span>
-                                </NFlex>
-                            </NFormItem>
-                            <NFormItem label="推送直通规则">
-                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
-                                    <DirectConfigEditor
-                                        :list="settings.direct_config"
-                                        :disabled="loading"
-                                    />
-                                    <span>
-                                        规则越靠前，优先级越高，一旦触发一个规则就直接进入推荐<br />
-                                        满足推送直通规则的不会受后续的二次判断和推荐规则影响
-                                    </span>
                                 </NFlex>
                             </NFormItem>
                         </NFlex>
@@ -259,12 +146,6 @@ const saveSettings = async () => {
                                 <NFormItem label="max-profit">
                                     <NInput
                                         v-model:value="settings.surebet_max_profit"
-                                        placeholder=""
-                                    />
-                                </NFormItem>
-                                <NFormItem label="outcomes">
-                                    <NInput
-                                        v-model:value="settings.surebet_outcomes"
                                         placeholder=""
                                     />
                                 </NFormItem>
