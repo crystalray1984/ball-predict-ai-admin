@@ -21,7 +21,7 @@ import {
     useMessage,
     type DataTableColumn,
 } from 'naive-ui'
-import { computed, onBeforeUnmount, reactive, ref, type Ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref, type Ref } from 'vue'
 
 interface Filter {
     tournament_id?: number
@@ -162,6 +162,8 @@ const applyFilter = async () => {
         timer = setInterval(loadData, 60000)
     }
 }
+
+onMounted(applyFilter)
 
 const columns = computed<DataTableColumn<OddDataRow>[]>(() => [
     {
