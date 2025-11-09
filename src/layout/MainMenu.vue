@@ -15,6 +15,10 @@ const menuOptions: MenuOption[] = [
         label: '盘口数据',
     },
     {
+        key: '/v2_to_v3',
+        label: '新老融合数据',
+    },
+    {
         key: '/manual_promote',
         label: '手动推荐',
     },

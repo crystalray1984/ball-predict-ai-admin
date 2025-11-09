@@ -1,5 +1,4 @@
 <script setup lang="tsx">
-import DirectConfigEditor from '@/components/DirectConfigEditor.vue'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
 import { pick } from 'lodash-es'
@@ -14,6 +13,8 @@ import {
     NInputGroup,
     NInputGroupLabel,
     NInputNumber,
+    NRadio,
+    NRadioGroup,
     NRow,
     useMessage,
 } from 'naive-ui'
@@ -122,6 +123,19 @@ const saveSettings = async () => {
                                         :style="{ width: '100px' }"
                                     />
                                 </NFlex>
+                            </NFormItem>
+
+                            <NFormItem label="新老融合推荐方向">
+                                <NRadioGroup v-model:value="settings.surebet_v2_to_v3_back">
+                                    <NRadio :value="0">正推</NRadio>
+                                    <NRadio :value="1">反推</NRadio>
+                                </NRadioGroup>
+                            </NFormItem>
+                            <NFormItem label="新老融合水位条件">
+                                <NInput
+                                    v-model:value="settings.surebet_v2_to_v3_min_value"
+                                    :style="{ width: '100px' }"
+                                />
                             </NFormItem>
                         </NFlex>
                     </NForm>

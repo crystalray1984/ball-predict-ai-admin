@@ -172,6 +172,14 @@ declare interface Setting {
     v3_check_min_duration: number
     v3_check_min_value: string
     v3_check_min_promote_value: string
+
+    /**
+     * 滚球采集规则
+     */
+    rockball_config: RockballConfig[]
+
+    surebet_v2_to_v3_back: number
+    surebet_v2_to_v3_min_value: string
 }
 
 declare interface SpecialConfig {
@@ -309,4 +317,14 @@ declare interface CrownOdd {
     created_at: string
     is_ignored: number
     promote_flag: number
+}
+
+/**
+ * 滚球采集规则
+ */
+declare interface RockballConfig extends SpecialEnable {
+    /**
+     * 水位条件
+     */
+    value: string
 }
