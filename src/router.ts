@@ -10,10 +10,11 @@ import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
 import Settings from './pages/Settings.vue'
 import SurebetRecords from './pages/SurebetRecords.vue'
+import SurebetV2ToV3 from './pages/SurebetV2ToV3.vue'
+import TournamentLabels from './pages/TournamentLabels.vue'
 import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
-import SurebetV2ToV3 from './pages/SurebetV2ToV3.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -68,6 +69,10 @@ export const router = createRouter({
                 {
                     path: '/v2_to_v3',
                     component: SurebetV2ToV3,
+                },
+                {
+                    path: '/tournament_labels',
+                    component: TournamentLabels,
                 },
             ],
         },

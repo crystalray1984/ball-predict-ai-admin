@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import PageGrid from '@/components/PageGrid.vue'
+import TournamentLabelSelect from '@/components/TournamentLabelSelect'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
 import { trim } from 'lodash-es'
@@ -9,6 +10,7 @@ import {
     NForm,
     NFormItem,
     NInput,
+    NInputGroup,
     NSelect,
     NSwitch,
     type DataTableColumn,
@@ -18,6 +20,7 @@ import { onMounted, reactive, ref, type Ref } from 'vue'
 const filter = reactive({
     name: '',
     order: 'name:asc',
+    label_id: undefined as unknown as number,
 })
 
 const { load, loading } = useLoader()
@@ -26,6 +29,7 @@ const list = ref([]) as Ref<Tournament[]>
 const applyFilter = async () => {
     const data: Record<string, any> = {
         name: trim(filter.name),
+        label_id: filter.label_id,
     }
     if (filter.order) {
         const [order_field, order_order] = filter.order.split(':')
@@ -61,14 +65,17 @@ const columns: DataTableColumn<Tournament>[] = [
     {
         key: 'id',
         title: '赛事ID',
+        width: 70,
     },
     {
         key: 'name',
         title: '赛事名称',
+        width: 500,
     },
     {
         key: 'is_open',
         title: '允许推荐',
+        width: 100,
         render: (row) => (
             <NSwitch
                 size="small"
@@ -80,7 +87,38 @@ const columns: DataTableColumn<Tournament>[] = [
             ></NSwitch>
         ),
     },
+    {
+        key: 'label_id',
+        title: '标签',
+        render: (row) => (
+            <NInputGroup>
+                <TournamentLabelSelect
+                    value={row.label_id}
+                    allowEmpty={true}
+                    onUpdateValue={(label_id: number) => onChangeTournamentLabel(row, label_id)}
+                    consistentMenuWidth={false}
+                    style={{ width: 'auto' }}
+                />
+            </NInputGroup>
+        ),
+    },
 ]
+
+/**
+ * 设置标签
+ * @param tournament_id
+ * @param label_id
+ */
+const onChangeTournamentLabel = async (tournament: Tournament, label_id: number) => {
+    tournament.label_id = label_id
+    api({
+        url: '/admin/match/label/set',
+        data: {
+            tournament_id: tournament.id,
+            label_id,
+        },
+    })
+}
 
 /**
  * 排序顺序
@@ -102,6 +140,16 @@ const orderOptions = [
             <NForm labelPlacement="left" :inline="true" :showFeedback="false" :disabled="loading">
                 <NFormItem label="赛事名称筛选">
                     <NInput v-model:value="filter.name" />
+                </NFormItem>
+                <NFormItem label="标签筛选">
+                    <TournamentLabelSelect
+                        v-model:value="filter.label_id"
+                        :clearable="true"
+                        placeholder="所有"
+                        :allowEmpty="true"
+                        :consistentMenuWidth="false"
+                        :style="{ minWidth: '120px' }"
+                    />
                 </NFormItem>
                 <NFormItem label="排序顺序">
                     <NSelect

@@ -24,7 +24,19 @@ declare interface Tournament {
     id: number
     name: string
     is_open: number
+    label_id: number
+    label_title: string
     is_updating?: boolean
+}
+
+/**
+ * 联赛标签
+ */
+declare interface TournamentLabel {
+    id: number
+    luffa_uid: string
+    luffa_type: number
+    title: string
 }
 
 declare interface Team {
