@@ -336,17 +336,32 @@ const doExport = () => {
                         <NStatistic label="推荐数" :value="summary.total ?? 0" />
                     </NCard>
                     <NCard size="small" class="statisitc-card">
-                        <NStatistic label="赢场数" :value="summary.win ?? 0" />
+                        <NStatistic label="赢场数">
+                            <NText type="success">{{ summary.win ?? 0 }}</NText>
+                        </NStatistic>
                     </NCard>
                     <NCard size="small" class="statisitc-card">
-                        <NStatistic label="和场数" :value="summary.draw ?? 0" />
+                        <NStatistic label="和场数">
+                            <NText type="warning">{{ summary.draw ?? 0 }}</NText>
+                        </NStatistic>
                     </NCard>
                     <NCard size="small" class="statisitc-card">
-                        <NStatistic label="输场数" :value="summary.loss ?? 0" />
+                        <NStatistic label="输场数">
+                            <NText type="error">{{ summary.loss ?? 0 }}</NText>
+                        </NStatistic>
                     </NCard>
                     <NCard size="small" class="statisitc-card">
-                        <NStatistic label="胜率" :value="summary.win_rate ?? 0">
-                            <template #suffix>%</template>
+                        <NStatistic label="胜率">
+                            <NText
+                                :type="
+                                    summary.win_rate === 0
+                                        ? undefined
+                                        : summary.win_rate >= 50
+                                        ? 'success'
+                                        : 'error'
+                                "
+                                >{{ summary.win_rate ?? 0 }}%</NText
+                            >
                         </NStatistic>
                     </NCard>
                 </NFlex>
