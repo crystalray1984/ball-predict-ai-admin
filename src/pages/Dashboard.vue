@@ -9,7 +9,6 @@ interface SummaryData {
     draw: number
     total: number
     win_rate: number
-    user: number
 }
 
 interface Summary<T> {
@@ -27,6 +26,11 @@ interface VipSummaryData {
     quarter: number
 }
 
+interface LabelSummary extends Summary<SummaryData> {
+    id: number
+    title: string
+}
+
 //概览数据
 const { data } = useApiQuery({
     queryKey: ['/admin/dashboard/summary'],
@@ -36,21 +40,119 @@ const { data } = useApiQuery({
         }),
 })
 
-//概览数据
-const { data: vipData } = useApiQuery({
-    queryKey: ['/admin/dashboard/vip_summary'],
+//新老融合概览数据
+const { data: v3Data } = useApiQuery({
+    queryKey: ['/admin/dashboard/v2_to_v3_summary'],
     queryFn: () =>
-        api<Summary<VipSummaryData>>({
-            url: '/admin/dashboard/vip_summary',
+        api<Summary<SummaryData>>({
+            url: '/admin/dashboard/v2_to_v3_summary',
+        }),
+})
+
+const { data: userData } = useApiQuery({
+    queryKey: ['/admin/dashboard/user_summary'],
+    queryFn: () =>
+        api<{
+            users: Summary<number>
+            vip: Summary<VipSummaryData>
+        }>({
+            url: '/admin/dashboard/user_summary',
+        }),
+})
+
+const { data: labelData } = useApiQuery({
+    queryKey: ['/admin/dashboard/label_summary'],
+    queryFn: () =>
+        api<LabelSummary[]>({
+            url: '/admin/dashboard/label_summary',
         }),
 })
 </script>
 <template>
     <div class="page">
         <NFlex :vertical="true" :size="12">
+            <NFlex v-if="false" :size="12">
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="用户数" :value="userData?.users.all ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日新增</NText>
+                        <NText>{{ userData?.users.today }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日新增</NText>
+                        <NText>{{ userData?.users.yesterday }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天新增</NText>
+                        <NText>{{ userData?.users.days_7 }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天新增</NText>
+                        <NText>{{ userData?.users.days_30 }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="VIP日卡" :value="userData?.vip.all.day ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ userData?.vip.today.day }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ userData?.vip.yesterday.day }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ userData?.vip.days_7.day }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ userData?.vip.days_30.day }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="VIP周卡" :value="userData?.vip.all.week ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ userData?.vip.today.week }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ userData?.vip.yesterday.week }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ userData?.vip.days_7.week }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ userData?.vip.days_30.week }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="VIP月卡" :value="userData?.vip.all.month ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ userData?.vip.today.month }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ userData?.vip.yesterday.month }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ userData?.vip.days_7.month }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ userData?.vip.days_30.month }}</NText>
+                    </div>
+                </NCard>
+            </NFlex>
+
             <NFlex :size="12">
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="推荐数" :value="data?.all.total ?? 0" />
+                    <NStatistic label="总台 - 推荐数" :value="data?.all.total ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
                         <NText>{{ data?.today.total }}</NText>
@@ -69,7 +171,7 @@ const { data: vipData } = useApiQuery({
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="赢场数" :value="data?.all.win ?? 0" />
+                    <NStatistic label="总台 - 赢场数" :value="data?.all.win ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
                         <NText>{{ data?.today.win }}</NText>
@@ -88,7 +190,7 @@ const { data: vipData } = useApiQuery({
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="和场数" :value="data?.all.draw ?? 0" />
+                    <NStatistic label="总台 - 和场数" :value="data?.all.draw ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
                         <NText>{{ data?.today.draw }}</NText>
@@ -107,7 +209,7 @@ const { data: vipData } = useApiQuery({
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="输场数" :value="data?.all.loss ?? 0" />
+                    <NStatistic label="总台 - 输场数" :value="data?.all.loss ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
                         <NText>{{ data?.today.loss }}</NText>
@@ -126,7 +228,7 @@ const { data: vipData } = useApiQuery({
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="胜率" :value="data?.all.win_rate ?? 0">
+                    <NStatistic label="总台 - 胜率" :value="data?.all.win_rate ?? 0">
                         <template #suffix>%</template>
                     </NStatistic>
                     <div class="statisitc-row">
@@ -146,86 +248,212 @@ const { data: vipData } = useApiQuery({
                         <NText>{{ data?.days_30.win_rate }}%</NText>
                     </div>
                 </NCard>
-                <NCard size="small" class="statisitc-card">
-                    <NStatistic label="用户数" :value="data?.all.user ?? 0" />
-                    <div class="statisitc-row">
-                        <NText :depth="3">今日新增</NText>
-                        <NText>{{ data?.today.user }}</NText>
-                    </div>
-                    <div class="statisitc-row">
-                        <NText :depth="3">昨日新增</NText>
-                        <NText>{{ data?.yesterday.user }}</NText>
-                    </div>
-                    <div class="statisitc-row">
-                        <NText :depth="3">最近7天新增</NText>
-                        <NText>{{ data?.days_7.user }}</NText>
-                    </div>
-                    <div class="statisitc-row">
-                        <NText :depth="3">最近30天新增</NText>
-                        <NText>{{ data?.days_30.user }}</NText>
-                    </div>
-                </NCard>
             </NFlex>
 
             <NFlex :size="12">
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="VIP日卡" :value="vipData?.all.day ?? 0" />
+                    <NStatistic label="新老融合 - 推荐数" :value="v3Data?.all.total ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
-                        <NText>{{ vipData?.today.day }}</NText>
+                        <NText>{{ v3Data?.today.total }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">昨日</NText>
-                        <NText>{{ vipData?.yesterday.day }}</NText>
+                        <NText>{{ v3Data?.yesterday.total }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近7天</NText>
-                        <NText>{{ vipData?.days_7.day }}</NText>
+                        <NText>{{ v3Data?.days_7.total }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近30天</NText>
-                        <NText>{{ vipData?.days_30.day }}</NText>
+                        <NText>{{ v3Data?.days_30.total }}</NText>
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="VIP周卡" :value="vipData?.all.week ?? 0" />
+                    <NStatistic label="新老融合 - 赢场数" :value="v3Data?.all.win ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
-                        <NText>{{ vipData?.today.week }}</NText>
+                        <NText>{{ v3Data?.today.win }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">昨日</NText>
-                        <NText>{{ vipData?.yesterday.week }}</NText>
+                        <NText>{{ v3Data?.yesterday.win }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近7天</NText>
-                        <NText>{{ vipData?.days_7.week }}</NText>
+                        <NText>{{ v3Data?.days_7.win }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近30天</NText>
-                        <NText>{{ vipData?.days_30.week }}</NText>
+                        <NText>{{ v3Data?.days_30.win }}</NText>
                     </div>
                 </NCard>
                 <NCard size="small" class="statisitc-card">
-                    <NStatistic label="VIP月卡" :value="vipData?.all.month ?? 0" />
+                    <NStatistic label="新老融合 - 和场数" :value="v3Data?.all.draw ?? 0" />
                     <div class="statisitc-row">
                         <NText :depth="3">今日</NText>
-                        <NText>{{ vipData?.today.month }}</NText>
+                        <NText>{{ v3Data?.today.draw }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">昨日</NText>
-                        <NText>{{ vipData?.yesterday.month }}</NText>
+                        <NText>{{ v3Data?.yesterday.draw }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近7天</NText>
-                        <NText>{{ vipData?.days_7.month }}</NText>
+                        <NText>{{ v3Data?.days_7.draw }}</NText>
                     </div>
                     <div class="statisitc-row">
                         <NText :depth="3">最近30天</NText>
-                        <NText>{{ vipData?.days_30.month }}</NText>
+                        <NText>{{ v3Data?.days_30.draw }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="新老融合 - 输场数" :value="v3Data?.all.loss ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ v3Data?.today.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ v3Data?.yesterday.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ v3Data?.days_7.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ v3Data?.days_30.loss }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="新老融合 - 胜率" :value="v3Data?.all.win_rate ?? 0">
+                        <template #suffix>%</template>
+                    </NStatistic>
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ v3Data?.today.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ v3Data?.yesterday.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ v3Data?.days_7.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ v3Data?.days_30.win_rate }}%</NText>
                     </div>
                 </NCard>
             </NFlex>
+
+            <template v-if="labelData">
+                <NFlex v-for="item of labelData" :key="item.id" :size="12">
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic
+                            :label="`${item.title} - 推荐数`"
+                            :value="item.all.total ?? 0"
+                        />
+                        <div class="statisitc-row">
+                            <NText :depth="3">今日</NText>
+                            <NText>{{ item.today.total }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">昨日</NText>
+                            <NText>{{ item.yesterday.total }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近7天</NText>
+                            <NText>{{ item.days_7.total }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近30天</NText>
+                            <NText>{{ item.days_30.total }}</NText>
+                        </div>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic :label="`${item.title} - 赢场数`" :value="item.all.win ?? 0" />
+                        <div class="statisitc-row">
+                            <NText :depth="3">今日</NText>
+                            <NText>{{ item.today.win }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">昨日</NText>
+                            <NText>{{ item.yesterday.win }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近7天</NText>
+                            <NText>{{ item.days_7.win }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近30天</NText>
+                            <NText>{{ item.days_30.win }}</NText>
+                        </div>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic :label="`${item.title} - 和场数`" :value="item.all.draw ?? 0" />
+                        <div class="statisitc-row">
+                            <NText :depth="3">今日</NText>
+                            <NText>{{ data?.today.draw }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">昨日</NText>
+                            <NText>{{ item.yesterday.draw }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近7天</NText>
+                            <NText>{{ item.days_7.draw }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近30天</NText>
+                            <NText>{{ item.days_30.draw }}</NText>
+                        </div>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic :label="`${item.title} - 输场数`" :value="item.all.loss ?? 0" />
+                        <div class="statisitc-row">
+                            <NText :depth="3">今日</NText>
+                            <NText>{{ item.today.loss }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">昨日</NText>
+                            <NText>{{ item.yesterday.loss }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近7天</NText>
+                            <NText>{{ item.days_7.loss }}</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近30天</NText>
+                            <NText>{{ item.days_30.loss }}</NText>
+                        </div>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic :label="`${item.title} - 胜率`" :value="item.all.win_rate ?? 0">
+                            <template #suffix>%</template>
+                        </NStatistic>
+                        <div class="statisitc-row">
+                            <NText :depth="3">今日</NText>
+                            <NText>{{ item.today.win_rate }}%</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">昨日</NText>
+                            <NText>{{ item.yesterday.win_rate }}%</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近7天</NText>
+                            <NText>{{ item.days_7.win_rate }}%</NText>
+                        </div>
+                        <div class="statisitc-row">
+                            <NText :depth="3">最近30天</NText>
+                            <NText>{{ item.days_30.win_rate }}%</NText>
+                        </div>
+                    </NCard>
+                </NFlex>
+            </template>
         </NFlex>
     </div>
 </template>

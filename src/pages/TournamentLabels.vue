@@ -3,6 +3,7 @@ import { ActionModal } from '@/components/modal'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
 import { useTournamentLabels } from '@/libs/query'
+import { useDialog } from '@/libs/ui'
 import type { DataTableColumn } from 'naive-ui'
 import {
     NButton,
@@ -45,7 +46,7 @@ const columns: DataTableColumn<TournamentLabel>[] = [
                 <NButton type="primary" size="tiny" onClick={() => editItem(row)}>
                     编辑
                 </NButton>
-                <NButton type="error" size="tiny">
+                <NButton type="error" size="tiny" onClick={() => removeItem(row)}>
                     删除
                 </NButton>
             </NFlex>
@@ -117,6 +118,26 @@ const saveItem = async () => {
         message.success('保存成功')
         refetch()
     }
+}
+
+const dialog = useDialog()
+const removeItem = async (row: TournamentLabel) => {
+    const close = await dialog.confirmAndWait({
+        title: `确认要删除标签“${row.title}”？`,
+    })
+    if (!close) return
+    const ret = await api({
+        url: '/admin/match/label/delete',
+        data: {
+            id: row.id,
+        },
+    })
+    if (ret.code === 0) {
+        refetch()
+    } else {
+        message.warning(ret.msg)
+    }
+    close()
 }
 </script>
 <template>

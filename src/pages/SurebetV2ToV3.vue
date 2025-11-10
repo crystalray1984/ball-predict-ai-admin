@@ -18,6 +18,8 @@ import {
     NTag,
     NText,
     useMessage,
+    NCard,
+    NStatistic,
     type DataTableColumn,
 } from 'naive-ui'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, type Ref } from 'vue'
@@ -52,6 +54,14 @@ interface OddData {
     odd_type: 'ah' | 'sum'
 }
 
+interface SummaryData {
+    win: number
+    loss: number
+    draw: number
+    total: number
+    win_rate: number
+}
+
 const message = useMessage()
 const start = dayjs().startOf('day')
 const end = dayjs().add(1, 'day').startOf('day')
@@ -69,6 +79,33 @@ const activeFilter = {
 const { load, loading } = useLoader()
 
 const list = ref([]) as Ref<OddData[]>
+
+const summary = computed<SummaryData>(() => {
+    let win = 0
+    let loss = 0
+    let draw = 0
+
+    list.value.forEach((row) => {
+        if (row.result === 1) {
+            win++
+        } else if (row.result === 0) {
+            draw++
+        } else if (row.result === -1) {
+            loss++
+        }
+    })
+
+    const valid = win + loss
+    const win_rate = valid > 0 ? Math.floor((win * 1000) / valid) / 10 : 0
+
+    return {
+        win,
+        loss,
+        draw,
+        win_rate,
+        total: list.value.length,
+    }
+})
 
 const mergeFilter = (target: Record<string, any>) => {
     target.order = trim(filter.order)
@@ -254,38 +291,66 @@ const doExport = () => {
 <template>
     <PageGrid :useContentScroller="false">
         <template #header>
-            <NForm labelPlacement="left" :inline="true" :showFeedback="false" :disabled="loading">
-                <NFormItem label="日期">
-                    <NDatePicker
-                        type="daterange"
-                        v-model:value="filter.dates"
-                        :inputReadonly="true"
-                    />
-                </NFormItem>
-                <NFormItem label="排序">
-                    <NSelect
-                        v-model:value="filter.order"
-                        :options="[
-                            {
-                                value: 'match_time',
-                                label: '比赛时间',
-                            },
-                            {
-                                value: 'promote_time',
-                                label: '推荐时间',
-                            },
-                        ]"
-                        :consistentMenuWidth="false"
-                        :style="{ minWidth: '100px' }"
-                    />
-                </NFormItem>
-                <NFormItem>
-                    <NButton type="primary" :loading="loading" @click="applyFilter">查询</NButton>
-                </NFormItem>
-                <NFormItem>
-                    <NButton type="warning" :disabled="loading" @click="doExport">导出</NButton>
-                </NFormItem>
-            </NForm>
+            <NFlex :vertical="true">
+                <NForm
+                    labelPlacement="left"
+                    :inline="true"
+                    :showFeedback="false"
+                    :disabled="loading"
+                >
+                    <NFormItem label="日期">
+                        <NDatePicker
+                            type="daterange"
+                            v-model:value="filter.dates"
+                            :inputReadonly="true"
+                        />
+                    </NFormItem>
+                    <NFormItem label="排序">
+                        <NSelect
+                            v-model:value="filter.order"
+                            :options="[
+                                {
+                                    value: 'match_time',
+                                    label: '比赛时间',
+                                },
+                                {
+                                    value: 'promote_time',
+                                    label: '推荐时间',
+                                },
+                            ]"
+                            :consistentMenuWidth="false"
+                            :style="{ minWidth: '100px' }"
+                        />
+                    </NFormItem>
+                    <NFormItem>
+                        <NButton type="primary" :loading="loading" @click="applyFilter"
+                            >查询</NButton
+                        >
+                    </NFormItem>
+                    <NFormItem>
+                        <NButton type="warning" :disabled="loading" @click="doExport">导出</NButton>
+                    </NFormItem>
+                </NForm>
+                <NFlex :size="12">
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="推荐数" :value="summary.total ?? 0" />
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="赢场数" :value="summary.win ?? 0" />
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="和场数" :value="summary.draw ?? 0" />
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="输场数" :value="summary.loss ?? 0" />
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="胜率" :value="summary.win_rate ?? 0">
+                            <template #suffix>%</template>
+                        </NStatistic>
+                    </NCard>
+                </NFlex>
+            </NFlex>
         </template>
         <NDataTable
             :data="list"
@@ -301,3 +366,26 @@ const doExport = () => {
         />
     </PageGrid>
 </template>
+<style lang="less" scoped>
+.statisitc-card {
+    width: auto;
+    flex: 1;
+
+    .statisitc-row {
+        display: flex;
+        justify-content: space-between;
+        white-space: nowrap;
+        gap: 12px;
+    }
+
+    .n-statistic {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &:deep(.n-statistic-value) {
+            margin-top: 0;
+        }
+    }
+}
+</style>
