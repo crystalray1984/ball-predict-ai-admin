@@ -1,5 +1,6 @@
 <script setup lang="tsx">
 import PageGrid from '@/components/PageGrid.vue'
+import TournamentLabelSelect from '@/components/TournamentLabelSelect'
 import { api } from '@/libs/api'
 import { ODD_TYPE_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
@@ -29,6 +30,7 @@ dayjs.extend(duration)
 interface Filter {
     dates: [number, number]
     order: string
+    label_id?: number
 }
 
 /**
@@ -52,6 +54,10 @@ interface OddData {
     score: string
     created_at: string
     odd_type: 'ah' | 'sum'
+    label: {
+        id: number
+        title: string
+    } | null
 }
 
 interface SummaryData {
@@ -74,6 +80,7 @@ const activeFilter = {
     start_date: start.format('YYYY-MM-DD') as string | undefined,
     end_date: end.format('YYYY-MM-DD') as string | undefined,
     order: 'promote_time',
+    label_id: undefined as undefined | number,
 }
 
 const { load, loading } = useLoader()
@@ -109,6 +116,7 @@ const summary = computed<SummaryData>(() => {
 
 const mergeFilter = (target: Record<string, any>) => {
     target.order = trim(filter.order)
+    target.label_id = filter.label_id
     if (filter.dates) {
         target.start_date = dayjs(filter.dates[0]).format('YYYY-MM-DD')
         target.end_date = dayjs(filter.dates[1]).format('YYYY-MM-DD')
@@ -160,6 +168,11 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
         key: 'tournament.name',
         title: '联赛',
         width: 150,
+    },
+    {
+        key: 'label.title',
+        title: '标签',
+        width: 80,
     },
     {
         key: 'team',
@@ -303,6 +316,16 @@ const doExport = () => {
                             type="daterange"
                             v-model:value="filter.dates"
                             :inputReadonly="true"
+                        />
+                    </NFormItem>
+                    <NFormItem label="标签">
+                        <TournamentLabelSelect
+                            v-model:value="filter.label_id"
+                            :clearable="true"
+                            :allowEmpty="true"
+                            :consistentMenuWidth="false"
+                            placeholder="所有"
+                            :style="{ minWidth: '100px' }"
                         />
                     </NFormItem>
                     <NFormItem label="排序">

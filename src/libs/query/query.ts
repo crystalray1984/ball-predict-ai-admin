@@ -7,7 +7,7 @@ import { useApiQuery, type InternalUseApiQueryOptions } from './helpers'
 export function useTournaments(options: InternalUseApiQueryOptions<Tournament[]> = {}) {
     return useApiQuery<Tournament[]>({
         ...options,
-        queryKey: [],
+        queryKey: ['/admin/match/tournament_list'],
         queryFn: () =>
             api<Tournament[]>({
                 url: '/admin/match/tournament_list',
@@ -24,7 +24,7 @@ export function useTournaments(options: InternalUseApiQueryOptions<Tournament[]>
 export function useTournamentLabels(options: InternalUseApiQueryOptions<TournamentLabel[]> = {}) {
     return useApiQuery<TournamentLabel[]>({
         ...options,
-        queryKey: [],
+        queryKey: ['/admin/match/label/list'],
         queryFn: () =>
             api<TournamentLabel[]>({
                 url: '/admin/match/label/list',
