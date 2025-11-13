@@ -339,4 +339,14 @@ declare interface RockballConfig extends SpecialEnable {
      * 水位条件
      */
     value: string
+
+    /**
+     * 需要监听的滚球盘口
+     */
+    odds: RockballOddInfo[]
+}
+
+declare interface RockballOddInfo extends OddInfo {
+    id: string | number
+    value: string
 }

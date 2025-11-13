@@ -19,6 +19,10 @@ const menuOptions: MenuOption[] = [
         label: '新老融合数据',
     },
     {
+        key: '/rockball',
+        label: '滚球数据',
+    },
+    {
         key: '/manual_promote',
         label: '手动推荐',
     },

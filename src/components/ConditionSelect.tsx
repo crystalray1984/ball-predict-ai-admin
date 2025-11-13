@@ -3,19 +3,6 @@ import Decimal from 'decimal.js'
 import { NSelect, type SelectProps } from 'naive-ui'
 import { computed, defineComponent, watch, type DefineComponent, type PropType } from 'vue'
 
-const _conditionOptions = (() => {
-    const output: { value: string; label: string; negative: boolean }[] = []
-    let num = Decimal(-10)
-    while (true) {
-        const negative = num.lt(0)
-        const value = num.toString()
-        output.push({ value, label: value, negative })
-        if (num.gt(10)) break
-        num = num.add('0.25')
-    }
-    return output
-})()
-
 const ahOptions = (() => {
     const output: { value: string; label: string }[] = []
     let num = Decimal(-10)

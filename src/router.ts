@@ -15,6 +15,7 @@ import TournamentLabels from './pages/TournamentLabels.vue'
 import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
+import Rockball from './pages/Rockball.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -73,6 +74,10 @@ export const router = createRouter({
                 {
                     path: '/tournament_labels',
                     component: TournamentLabels,
+                },
+                {
+                    path: '/rockball',
+                    component: Rockball,
                 },
             ],
         },

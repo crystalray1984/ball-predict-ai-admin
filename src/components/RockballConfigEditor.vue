@@ -10,11 +10,11 @@ import {
     NForm,
     NFormItem,
     NIcon,
+    NInput,
     NInputGroup,
     NInputGroupLabel,
     NSelect,
     useMessage,
-    NInput,
     type DataTableColumn,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
@@ -62,6 +62,54 @@ const columns: DataTableColumn<RockballConfig>[] = [
                 : '-',
     },
     {
+        key: 'odds',
+        title: '追踪盘口',
+        // render: (row) => {
+        //     if (row.odds.length === 0) return
+        //     return (
+        //         <NList>
+        //             {row.odds.map((odd) => (
+        //                 <NListItem key={odd.id}>abc</NListItem>
+        //             ))}
+        //         </NList>
+        //     )
+        // },
+        render: (row) => (
+            <NFlex vertical={true} inline={false}>
+                {row.odds.map((odd, index) => (
+                    <NFlex key={odd.id} align="center">
+                        <span>
+                            {PERIOD_TEXT[odd.period]} {ODD_TYPE_TEXT[odd.type]} {odd.condition}{' '}
+                            {`水位≥${odd.value}`}
+                        </span>
+                        <NButton
+                            size="tiny"
+                            type="error"
+                            text={true}
+                            onClick={() => row.odds.splice(index)}
+                        >
+                            {{
+                                icon: () => (
+                                    <NIcon>
+                                        <CloseCircleOutlined />
+                                    </NIcon>
+                                ),
+                            }}
+                        </NButton>
+                    </NFlex>
+                ))}
+                <NButton
+                    size="tiny"
+                    type="info"
+                    style={{ alignSelf: 'flex-start' }}
+                    onClick={() => addOdd(row)}
+                >
+                    +
+                </NButton>
+            </NFlex>
+        ),
+    },
+    {
         key: 'actions',
         render: (_, index) => (
             <NButton size="tiny" type="error" text={true} onClick={() => remove(index)}>
@@ -94,8 +142,10 @@ const oddTypeOptions = Object.entries(ODD_TYPE_TEXT)
 const add = () => {
     addModal.data = {
         id: nanoid(),
+        condition_symbol: '=',
         condition: '0',
         value: '1.00',
+        odds: [],
     }
     addModal.show = true
 }
@@ -107,10 +157,9 @@ const submitAdd = () => {
     if (
         isNullOrUndefined(addModal.data.variety) &&
         isNullOrUndefined(addModal.data.period) &&
-        isNullOrUndefined(addModal.data.type) &&
-        isNullOrUndefined(addModal.data.condition_symbol)
+        isNullOrUndefined(addModal.data.type)
     ) {
-        message.warning('时段、玩法、原始盘口方向、盘口这4个条件必须限制至少1个')
+        message.warning('时段、玩法、盘口这3个条件必须限制至少1个')
         return
     }
 
@@ -132,6 +181,51 @@ const submitAdd = () => {
         ...addModal.data,
     })
     addModal.show = false
+}
+
+const addOdd = (target: RockballConfig) => {
+    addOddModal.target = target
+    addOddModal.data = {
+        id: nanoid(),
+        period: undefined as unknown as Period,
+        variety: target.variety!,
+        type: undefined as unknown as OddType,
+        condition: '0',
+        value: '1.00',
+    }
+    addOddModal.show = true
+}
+
+const addOddModal = reactive({
+    show: false,
+    data: null as unknown as RockballOddInfo,
+    target: null as unknown as RockballConfig,
+})
+
+const submitAddOdd = () => {
+    if (!addOddModal.data.period) {
+        message.warning('请选择时段')
+        return
+    }
+    if (!addOddModal.data.type) {
+        message.warning('请选择盘口方向')
+        return
+    }
+
+    //重复检查
+    const exists = addOddModal.target.odds.some((org) => {
+        if (!eq(org.variety, addOddModal.data.variety)) return false
+        if (!eq(org.period, addOddModal.data.period)) return false
+        if (!eq(org.type, addOddModal.data.type)) return false
+        return Decimal(org.condition).eq(addOddModal.data.condition)
+    })
+    if (exists) {
+        message.warning('已经设置了相同的追踪盘口')
+        return
+    }
+
+    addOddModal.target.odds.push(addOddModal.data)
+    addOddModal.show = false
 }
 </script>
 <template>
@@ -157,7 +251,7 @@ const submitAdd = () => {
             添加规则
         </NButton>
         <ActionModal
-            title="添加推荐特殊规则"
+            title="添加滚球规则"
             v-model:show="addModal.show"
             :data="addModal.data"
             :style="{ width: '400px' }"
@@ -166,28 +260,13 @@ const submitAdd = () => {
             <NForm :showFeedback="false" labelWidth="88px" labelPlacement="left">
                 <NFlex :vertical="true" size="large">
                     <NFormItem label="时段">
-                        <NSelect
-                            v-model:value="addModal.data.period"
-                            :options="periodOptions"
-                            :clearable="true"
-                            placeholder="不限"
-                        />
+                        <NSelect v-model:value="addModal.data.period" :options="periodOptions" />
                     </NFormItem>
                     <NFormItem label="玩法">
-                        <NSelect
-                            v-model:value="addModal.data.variety"
-                            :options="varietyOptions"
-                            :clearable="true"
-                            placeholder="不限"
-                        />
+                        <NSelect v-model:value="addModal.data.variety" :options="varietyOptions" />
                     </NFormItem>
                     <NFormItem label="盘口方向">
-                        <NSelect
-                            v-model:value="addModal.data.type"
-                            :options="oddTypeOptions"
-                            :clearable="true"
-                            placeholder="不限"
-                        />
+                        <NSelect v-model:value="addModal.data.type" :options="oddTypeOptions" />
                     </NFormItem>
                     <NFormItem label="盘口条件">
                         <ConditionSelect
@@ -199,6 +278,39 @@ const submitAdd = () => {
                         <NInputGroup>
                             <NInputGroupLabel>≥</NInputGroupLabel>
                             <NInput v-model:value="addModal.data.value" />
+                        </NInputGroup>
+                    </NFormItem>
+                </NFlex>
+            </NForm>
+        </ActionModal>
+        <ActionModal
+            title="添加滚球追踪盘口"
+            v-model:show="addOddModal.show"
+            :data="addOddModal.data"
+            :style="{ width: '400px' }"
+            @positiveClick="submitAddOdd"
+        >
+            <NForm :showFeedback="false" labelWidth="88px" labelPlacement="left">
+                <NFlex :vertical="true" size="large">
+                    <NFormItem label="时段">
+                        <NSelect v-model:value="addOddModal.data.period" :options="periodOptions" />
+                    </NFormItem>
+                    <NFormItem label="玩法">
+                        {{ VARIETY_TEXT[addOddModal.data.variety] }}
+                    </NFormItem>
+                    <NFormItem label="盘口方向">
+                        <NSelect v-model:value="addOddModal.data.type" :options="oddTypeOptions" />
+                    </NFormItem>
+                    <NFormItem label="盘口条件">
+                        <ConditionSelect
+                            v-model:value="addOddModal.data.condition"
+                            :oddType="addOddModal.data.type"
+                        />
+                    </NFormItem>
+                    <NFormItem label="水位条件">
+                        <NInputGroup>
+                            <NInputGroupLabel>≥</NInputGroupLabel>
+                            <NInput v-model:value="addOddModal.data.value" />
                         </NInputGroup>
                     </NFormItem>
                 </NFlex>

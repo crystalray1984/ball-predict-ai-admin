@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import RockballConfigEditor from '@/components/RockballConfigEditor.vue'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
 import { pick } from 'lodash-es'
@@ -135,6 +136,13 @@ const saveSettings = async () => {
                                 <NInput
                                     v-model:value="settings.surebet_v2_to_v3_min_value"
                                     :style="{ width: '100px' }"
+                                />
+                            </NFormItem>
+
+                            <NFormItem label="滚球采集规则">
+                                <RockballConfigEditor
+                                    :list="settings.rockball_config"
+                                    :disabled="loading"
                                 />
                             </NFormItem>
                         </NFlex>
