@@ -62,6 +62,11 @@ const columns: DataTableColumn<RockballConfig>[] = [
                 : '-',
     },
     {
+        key: 'value',
+        title: '水位',
+        render: (row) => `≥${row.value}`,
+    },
+    {
         key: 'odds',
         title: '追踪盘口',
         // render: (row) => {
