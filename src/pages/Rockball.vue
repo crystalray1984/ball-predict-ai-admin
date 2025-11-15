@@ -98,7 +98,9 @@ const summary = computed<SummaryData>(() => {
     let loss = 0
     let draw = 0
 
-    list.value.forEach((row) => {
+    const filtered = list.value.filter((t) => !!t.promoted_at)
+
+    filtered.forEach((row) => {
         if (row.result === 1) {
             win++
         } else if (row.result === 0) {
@@ -116,7 +118,7 @@ const summary = computed<SummaryData>(() => {
         loss,
         draw,
         win_rate,
-        total: list.value.length,
+        total: filtered.length,
     }
 })
 
@@ -195,7 +197,7 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
     {
         key: 'source',
         title: '触发条件',
-        width: 120,
+        width: 140,
         render: (row) => {
             const texts: string[] = []
             texts.push(PERIOD_TEXT[row.source_period])
@@ -208,9 +210,12 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
                 texts.push(Decimal(row.source_condition).toString())
             }
 
-            texts.push('水位≥' + Number(row.source_value))
-
-            return texts.join(' ')
+            return (
+                <>
+                    <div>{texts.join(' ')}</div>
+                    <div>{'水位=' + Number(row.source_value)}</div>
+                </>
+            )
         },
     },
     {
@@ -225,7 +230,7 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
     {
         key: 'odd',
         title: '追踪盘口',
-        width: 120,
+        width: 140,
         render: (row) => {
             const texts: string[] = []
             texts.push(PERIOD_TEXT[row.period])
@@ -238,9 +243,12 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
                 texts.push(Decimal(row.condition).toString())
             }
 
-            texts.push('水位≥' + Number(row.value))
-
-            return texts.join(' ')
+            return (
+                <>
+                    <div>{texts.join(' ')}</div>
+                    <div>{'水位≥' + Number(row.value)}</div>
+                </>
+            )
         },
     },
     {
@@ -325,7 +333,7 @@ const doExport = () => {
     form.target = '_blank'
     form.method = 'POST'
     form.action = new URL(
-        '/admin/v2_to_v3/export',
+        '/admin/rockball/export',
         import.meta.env.VITE_API_URL || location.href,
     ).href
     form.enctype = 'application/x-www-form-urlencoded'
@@ -416,9 +424,9 @@ const setIsOpen = async (row: OddData, is_open: number) => {
                             >查询</NButton
                         >
                     </NFormItem>
-                    <!-- <NFormItem>
+                    <NFormItem>
                         <NButton type="warning" :disabled="loading" @click="doExport">导出</NButton>
-                    </NFormItem> -->
+                    </NFormItem>
                 </NForm>
                 <NFlex :size="12">
                     <NCard size="small" class="statisitc-card">
