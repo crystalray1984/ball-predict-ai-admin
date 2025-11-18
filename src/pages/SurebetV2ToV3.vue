@@ -1,26 +1,28 @@
 <script setup lang="tsx">
+import srcSound from '@/assets/rings.mp3'
 import PageGrid from '@/components/PageGrid.vue'
 import TournamentLabelSelect from '@/components/TournamentLabelSelect'
 import { api } from '@/libs/api'
 import { ODD_TYPE_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
+import { createAudio } from '@/libs/sound'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import Decimal from 'decimal.js'
 import { trim } from 'lodash-es'
 import {
     NButton,
+    NCard,
     NDataTable,
     NDatePicker,
     NFlex,
     NForm,
     NFormItem,
     NSelect,
+    NStatistic,
     NTag,
     NText,
     useMessage,
-    NCard,
-    NStatistic,
     type DataTableColumn,
 } from 'naive-ui'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, type Ref } from 'vue'
@@ -32,6 +34,10 @@ interface Filter {
     order: string
     label_id?: number
 }
+
+const sound = createAudio(srcSound)
+// @ts-ignore
+window.$sound = sound
 
 /**
  * 比赛数据
@@ -130,7 +136,7 @@ onBeforeUnmount(() => {
     clearInterval(timer)
 })
 
-const loadData = async () => {
+const loadData = async (auto = false) => {
     const ret = await api<OddData[]>({
         url: '/admin/v2_to_v3/list',
         data: activeFilter,
@@ -140,7 +146,17 @@ const loadData = async () => {
         message.warning(ret.msg)
         return false
     } else {
+        if (auto) {
+            const exists = list.value.map((t) => t.id)
+            for (const newData of ret.data) {
+                if (!exists.includes(newData.id)) {
+                    sound.play()
+                    break
+                }
+            }
+        }
         list.value = ret.data
+
         return true
     }
 }
@@ -148,9 +164,9 @@ const loadData = async () => {
 const applyFilter = async () => {
     clearInterval(timer)
     mergeFilter(activeFilter)
-    const success = await load(loadData)
+    const success = await load(() => loadData(false))
     if (success) {
-        timer = setInterval(loadData, 60000)
+        timer = setInterval(() => loadData(true), 60000)
     }
 }
 
