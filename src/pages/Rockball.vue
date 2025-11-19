@@ -9,6 +9,7 @@ import Decimal from 'decimal.js'
 import {
     NButton,
     NCard,
+    NCheckbox,
     NDataTable,
     NDatePicker,
     NFlex,
@@ -30,6 +31,7 @@ interface Filter {
     dates: [number, number]
     order: string
     promote?: number
+    auto_hide?: boolean
 }
 
 /**
@@ -81,12 +83,14 @@ const end = dayjs().add(1, 'day').startOf('day')
 const filter = reactive<Filter>({
     dates: [start.valueOf(), end.valueOf()],
     order: 'promote_time',
+    auto_hide: true,
 })
 
 const activeFilter = {
     start_date: start.format('YYYY-MM-DD') as string | undefined,
     end_date: end.format('YYYY-MM-DD') as string | undefined,
     order: 'promote_time',
+    auto_hide: true,
 }
 
 const { load, loading } = useLoader()
@@ -418,6 +422,11 @@ const setIsOpen = async (row: OddData, is_open: number) => {
                             :consistentMenuWidth="false"
                             :style="{ minWidth: '100px' }"
                         />
+                    </NFormItem>
+                    <NFormItem>
+                        <NCheckbox v-model:checked="filter.auto_hide"
+                            >自动隐藏到期未匹配的记录</NCheckbox
+                        >
                     </NFormItem>
                     <NFormItem>
                         <NButton type="primary" :loading="loading" @click="applyFilter"

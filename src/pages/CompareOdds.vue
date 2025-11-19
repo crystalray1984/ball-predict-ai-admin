@@ -56,6 +56,7 @@ interface OddData extends OddInfo {
         score: string
         final_rule: string
         created_at: string
+        value: string
     } & OddInfo
     has_score: number
     has_period1_score: number
@@ -71,17 +72,13 @@ const message = useMessage()
 
 const filter = reactive<Filter>({
     dates: [start.valueOf(), end.valueOf()],
+    ready_status: 1,
 })
 
 const activeFilter = {
-    tournament_id: undefined as undefined | number,
-    team: '',
     start_date: start.format('YYYY-MM-DD') as string | undefined,
     end_date: end.format('YYYY-MM-DD') as string | undefined,
-    matched1: undefined as number | undefined,
-    matched2: undefined as number | string | undefined,
-    variety: undefined as string | undefined,
-    period: undefined as string | undefined,
+    ready_state: undefined as number | undefined,
     promoted: undefined as number | undefined,
 }
 
@@ -274,12 +271,6 @@ const columns: DataTableColumn<OddData>[] = [
         render: (row) => Decimal(row.surebet_value).toFixed(4),
     },
     {
-        key: 'crown_value',
-        title: '一次水位',
-        width: 70,
-        render: (row) => (row.crown_value ? Decimal(row.crown_value).toFixed(4) : ''),
-    },
-    {
         key: 'created_at',
         title: '一次比对时间',
         width: 90,
@@ -366,6 +357,15 @@ const columns: DataTableColumn<OddData>[] = [
                     <span>{texts.join(' ')}</span>
                 </NFlex>
             )
+        },
+    },
+    {
+        key: 'promoted_value',
+        title: '推荐水位',
+        width: 100,
+        render: (row) => {
+            if (!row.promoted) return
+            return Number(row.promoted.value)
         },
     },
     {
