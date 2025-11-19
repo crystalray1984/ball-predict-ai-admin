@@ -129,6 +129,7 @@ const summary = computed<SummaryData>(() => {
 const mergeFilter = (target: Record<string, any>) => {
     target.promote = filter.promote
     target.order = filter.order
+    target.auto_hide = filter.auto_hide
     if (filter.dates) {
         target.start_date = dayjs(filter.dates[0]).format('YYYY-MM-DD')
         target.end_date = dayjs(filter.dates[1]).format('YYYY-MM-DD')
