@@ -16,6 +16,7 @@ import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import VipRecords from './pages/VipRecords.vue'
 import Rockball from './pages/Rockball.vue'
+import CompareOdds from './pages/CompareOdds.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -38,6 +39,10 @@ export const router = createRouter({
                 {
                     path: '/odds',
                     component: Odds,
+                },
+                {
+                    path: '/compare_odds',
+                    component: CompareOdds,
                 },
                 {
                     path: '/matches',

@@ -19,6 +19,10 @@ const menuOptions: MenuOption[] = [
         label: '新老融合数据',
     },
     {
+        key: '/compare_odds',
+        label: '对比数据',
+    },
+    {
         key: '/rockball',
         label: '滚球数据',
     },

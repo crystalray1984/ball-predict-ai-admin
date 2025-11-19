@@ -49,6 +49,15 @@ const { data: v3Data } = useApiQuery({
         }),
 })
 
+//对比概览数据
+const { data: compareData } = useApiQuery({
+    queryKey: ['/admin/dashboard/compare_summary'],
+    queryFn: () =>
+        api<Summary<SummaryData>>({
+            url: '/admin/dashboard/compare_summary',
+        }),
+})
+
 const { data: userData } = useApiQuery({
     queryKey: ['/admin/dashboard/user_summary'],
     queryFn: () =>
@@ -346,6 +355,106 @@ const { data: labelData } = useApiQuery({
                     <div class="statisitc-row">
                         <NText :depth="3">最近30天</NText>
                         <NText>{{ v3Data?.days_30.win_rate }}%</NText>
+                    </div>
+                </NCard>
+            </NFlex>
+
+            <NFlex :size="12">
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="对比 - 推荐数" :value="compareData?.all.total ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ compareData?.today.total }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ compareData?.yesterday.total }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ compareData?.days_7.total }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ compareData?.days_30.total }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="对比 - 赢场数" :value="compareData?.all.win ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ compareData?.today.win }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ compareData?.yesterday.win }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ compareData?.days_7.win }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ compareData?.days_30.win }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="对比 - 和场数" :value="compareData?.all.draw ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ compareData?.today.draw }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ compareData?.yesterday.draw }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ compareData?.days_7.draw }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ compareData?.days_30.draw }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="对比 - 输场数" :value="compareData?.all.loss ?? 0" />
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ compareData?.today.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ compareData?.yesterday.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ compareData?.days_7.loss }}</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ compareData?.days_30.loss }}</NText>
+                    </div>
+                </NCard>
+                <NCard size="small" class="statisitc-card">
+                    <NStatistic label="对比 - 胜率" :value="compareData?.all.win_rate ?? 0">
+                        <template #suffix>%</template>
+                    </NStatistic>
+                    <div class="statisitc-row">
+                        <NText :depth="3">今日</NText>
+                        <NText>{{ compareData?.today.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">昨日</NText>
+                        <NText>{{ compareData?.yesterday.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近7天</NText>
+                        <NText>{{ compareData?.days_7.win_rate }}%</NText>
+                    </div>
+                    <div class="statisitc-row">
+                        <NText :depth="3">最近30天</NText>
+                        <NText>{{ compareData?.days_30.win_rate }}%</NText>
                     </div>
                 </NCard>
             </NFlex>
