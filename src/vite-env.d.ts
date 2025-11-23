@@ -257,6 +257,7 @@ declare interface User {
     created_at: string
     reg_source: string
     luffa: UserConnect | null
+    email: UserConnect | null
     status: number
 }
 

@@ -78,10 +78,9 @@ const columns: DataTableColumn<User>[] = [
         render: (row) => row.luffa?.account,
     },
     {
-        key: 'reg_source',
-        title: '来源',
-        width: 100,
-        render: (row) => USER_REG_SOURCE_TEXT[row.reg_source],
+        key: 'email',
+        title: '邮箱',
+        render: (row) => row.email?.account,
     },
     {
         key: 'status',
