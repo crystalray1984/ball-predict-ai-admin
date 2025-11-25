@@ -24,17 +24,14 @@ import { reactive } from 'vue'
 
 interface Filter {
     platform: 'win32' | 'darwin'
-    arch?: 'x64' | 'ia32'
 }
 
 const filter = reactive<Filter>({
     platform: 'win32',
-    arch: 'x64',
 })
 
 const activeFilter: Filter = {
     platform: 'win32',
-    arch: 'x64',
 }
 
 const { list, load, loading, pagination, page } = useListLoader<DesktopClientVersionInList>({
@@ -50,7 +47,6 @@ const { list, load, loading, pagination, page } = useListLoader<DesktopClientVer
 
 const applyFilter = () => {
     activeFilter.platform = filter.platform
-    activeFilter.arch = filter.platform === 'win32' ? filter.arch : undefined
     load(1)
 }
 
@@ -286,16 +282,6 @@ const saveVersion = async () => {
                         :options="[
                             { value: 'win32', label: 'Windows' },
                             { value: 'darwin', label: 'MacOS' },
-                        ]"
-                        :consistentMenuWidth="false"
-                    />
-                </NFormItem>
-                <NFormItem v-if="filter.platform === 'win32'" label="架构">
-                    <NSelect
-                        v-model:value="filter.arch"
-                        :options="[
-                            { value: 'x64', label: '64位' },
-                            { value: 'ia32', label: '32位' },
                         ]"
                         :consistentMenuWidth="false"
                     />
