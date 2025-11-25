@@ -3,20 +3,21 @@ import { api } from '@/libs/api'
 import { useAdmin } from '@/libs/store'
 import { token } from '@/libs/token'
 import { createMemoryHistory, createRouter } from 'vue-router'
+import CompareOdds from './pages/CompareOdds.vue'
 import Dashboard from './pages/Dashboard.vue'
 import Login from './pages/Login.vue'
 import ManualPromote from './pages/ManualPromote.vue'
 import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
+import Rockball from './pages/Rockball.vue'
 import Settings from './pages/Settings.vue'
 import SurebetRecords from './pages/SurebetRecords.vue'
 import SurebetV2ToV3 from './pages/SurebetV2ToV3.vue'
 import TournamentLabels from './pages/TournamentLabels.vue'
 import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
+import Versions from './pages/Versions.vue'
 import VipRecords from './pages/VipRecords.vue'
-import Rockball from './pages/Rockball.vue'
-import CompareOdds from './pages/CompareOdds.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -83,6 +84,10 @@ export const router = createRouter({
                 {
                     path: '/rockball',
                     component: Rockball,
+                },
+                {
+                    path: '/versions',
+                    component: Versions,
                 },
             ],
         },

@@ -109,3 +109,55 @@ export function success<T>(data?: T) {
         data,
     }
 }
+
+/**
+ * 文件上传
+ */
+export interface UploadOptions {
+    file: File
+    type: string
+    onProgress?: (data: { loaded: number; total: number }) => void
+}
+
+interface RawUploadForm {
+    post_url: string
+    fields: Record<string, any>
+    file_path: string
+    file_url: string
+}
+
+/**
+ * 文件上传
+ * @param options
+ */
+export async function upload(options: UploadOptions): Promise<ApiResp<RemoteFile>> {
+    const { file, type, onProgress } = options
+
+    const retForm = await api<RawUploadForm>({
+        url: '/admin/common/create_upload_form',
+        data: {
+            type,
+            filename: file.name,
+        },
+    })
+    if (retForm.code) {
+        return retForm as any
+    }
+
+    //上传
+    const data = new FormData()
+    Object.entries(retForm.data.fields).forEach(([name, value]) => data.append(name, value))
+    data.append('file', file)
+
+    await axios.request({
+        url: retForm.data.post_url,
+        method: 'POST',
+        data,
+        onUploadProgress: onProgress as any,
+    })
+
+    return success({
+        url: retForm.data.file_url,
+        path: retForm.data.file_path,
+    })
+}

@@ -58,6 +58,10 @@ const menuOptions: MenuOption[] = [
         key: '/settings',
         label: '系统设置',
     },
+    // {
+    //     key: '/versions',
+    //     label: '版本管理',
+    // },
 ]
 
 const renderLabel = (option: MenuOption | MenuGroupOption): VNodeChild => {

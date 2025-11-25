@@ -299,12 +299,9 @@ interface ManualPromoteOdd extends OddInfo {
     team2: Team
     promoted?: {
         id: number
-        result: {
-            result: number
-            score: string
-        } | null
         back: number
         score: string
+        result: number | null
     } & OddInfo
     has_score: number
     has_period1_score: number
@@ -350,4 +347,42 @@ declare interface RockballConfig extends SpecialEnable {
 declare interface RockballOddInfo extends OddInfo {
     id: string | number
     value: string
+}
+
+declare interface ClientVersion {
+    id: number
+    platform: 'win32' | 'darwin'
+    arch: '' | 'x64' | 'ia32'
+    version: string
+    status: number
+    is_mandatory: number
+}
+
+declare interface ClientPackage {
+    url: string
+    hash: string
+    size: number
+    blockmap?: string
+}
+
+declare interface DesktopClientVersion extends ClientVersion {
+    full_info?: ClientPackage
+    hot_update_info?: ClientPackage
+    full_file?: File
+    full_blockmap?: File
+    hot_update_file?: File
+    hot_update_blockmap?: File
+}
+
+declare interface RemoteFile {
+    url: string
+    path: string
+}
+
+declare interface SummaryData {
+    win: number
+    loss: number
+    draw: number
+    total: number
+    win_rate: number
 }

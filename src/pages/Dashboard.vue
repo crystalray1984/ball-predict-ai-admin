@@ -3,14 +3,6 @@ import { api } from '@/libs/api'
 import { useApiQuery } from '@/libs/query'
 import { NCard, NFlex, NStatistic, NText } from 'naive-ui'
 
-interface SummaryData {
-    win: number
-    loss: number
-    draw: number
-    total: number
-    win_rate: number
-}
-
 interface Summary<T> {
     today: T
     yesterday: T

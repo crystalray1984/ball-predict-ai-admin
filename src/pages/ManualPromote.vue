@@ -18,17 +18,26 @@ import {
     NTag,
     NText,
     useMessage,
+    NStatistic,
     type DataTableColumn,
 } from 'naive-ui'
+import { ref } from 'vue'
+
+const summary = ref<SummaryData>()
 
 const { list, loading, load, pagination, page } = useListLoader<ManualPromoteRecord>({
-    loader: (params) =>
-        api({
+    loader: async (params) => {
+        const ret = await api<ListData<ManualPromoteRecord> & { summary: SummaryData }>({
             url: '/admin/manual_promote/list',
             data: {
                 ...params,
             },
-        }),
+        })
+        if (!ret.code) {
+            summary.value = ret.data.summary
+        }
+        return ret
+    },
 })
 
 const applyFilter = () => {
@@ -114,27 +123,27 @@ const columns: DataTableColumn<ManualPromoteOdd>[] = [
         width: 80,
         render: (row) => {
             if (!row.promoted) return
-            if (!row.promoted.result) return '待定'
-            switch (row.promoted.result.result) {
+            if (typeof row.promoted.result !== 'number') return '待定'
+            switch (row.promoted.result) {
                 case -1:
                     return (
                         <NFlex size="small" align="center">
                             <NText type="error">输</NText>
-                            <span>({row.promoted.result.score})</span>
+                            <span>({row.promoted.score})</span>
                         </NFlex>
                     )
                 case 1:
                     return (
                         <NFlex size="small" align="center">
                             <NText type="success">赢</NText>
-                            <span>({row.promoted.result.score})</span>
+                            <span>({row.promoted.score})</span>
                         </NFlex>
                     )
                 default:
                     return (
                         <NFlex size="small" align="center">
                             <NText type="warning">和</NText>
-                            <span>({row.promoted.result.score})</span>
+                            <span>({row.promoted.score})</span>
                         </NFlex>
                     )
             }
@@ -193,14 +202,57 @@ const remove = async (id: number, odd_id?: number) => {
 <template>
     <PageGrid>
         <template #header>
-            <NForm labelPlacement="left" :inline="true" :showFeedback="false" :disabled="loading">
-                <NFormItem>
-                    <NButton type="primary" :loading="loading" @click="applyFilter">刷新</NButton>
-                </NFormItem>
-                <!-- <NFormItem>
+            <NFlex :vertical="true">
+                <NForm
+                    labelPlacement="left"
+                    :inline="true"
+                    :showFeedback="false"
+                    :disabled="loading"
+                >
+                    <NFormItem>
+                        <NButton type="primary" :loading="loading" @click="applyFilter"
+                            >刷新</NButton
+                        >
+                    </NFormItem>
+                    <!-- <NFormItem>
                     <NButton type="warning">添加推荐</NButton>
                 </NFormItem> -->
-            </NForm>
+                </NForm>
+                <NFlex v-if="summary" :size="12">
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="推荐数" :value="summary.total ?? 0" />
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="赢场数">
+                            <NText type="success">{{ summary.win ?? 0 }}</NText>
+                        </NStatistic>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="和场数">
+                            <NText type="warning">{{ summary.draw ?? 0 }}</NText>
+                        </NStatistic>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="输场数">
+                            <NText type="error">{{ summary.loss ?? 0 }}</NText>
+                        </NStatistic>
+                    </NCard>
+                    <NCard size="small" class="statisitc-card">
+                        <NStatistic label="胜率">
+                            <NText
+                                :type="
+                                    summary.win_rate === 0
+                                        ? undefined
+                                        : summary.win_rate >= 50
+                                        ? 'success'
+                                        : 'error'
+                                "
+                                >{{ summary.win_rate ?? 0 }}%</NText
+                            >
+                        </NStatistic>
+                    </NCard>
+                </NFlex>
+            </NFlex>
         </template>
         <div class="list-container">
             <NScrollbar>
@@ -249,6 +301,28 @@ const remove = async (id: number, odd_id?: number) => {
 
     .n-card + .n-card {
         margin-top: 12px;
+    }
+}
+
+.statisitc-card {
+    width: auto;
+    flex: 1;
+
+    .statisitc-row {
+        display: flex;
+        justify-content: space-between;
+        white-space: nowrap;
+        gap: 12px;
+    }
+
+    .n-statistic {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        &:deep(.n-statistic-value) {
+            margin-top: 0;
+        }
     }
 }
 </style>
