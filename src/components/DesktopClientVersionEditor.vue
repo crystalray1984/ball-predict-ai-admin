@@ -27,7 +27,7 @@ const props = defineProps({
 })
 </script>
 <template>
-    <NForm :showFeedback="false">
+    <NForm :showFeedback="false" :disabled="disabled">
         <NRow :gutter="[20, 20]">
             <NCol v-if="data.platform === 'win32'" :span="12">
                 <NFormItem label="架构">
@@ -66,37 +66,22 @@ const props = defineProps({
                 </NFormItem>
             </NCol>
             <NCol :span="24">
-                <NFormItem label="全量安装包" :required="!data.id">
+                <NFormItem label="全量安装包" :required="!data.id && !data.full_info">
                     <NFlex :wrap="false" align="center" :style="{ flex: 1 }">
                         <FilePicker
-                            :accept="data.platform === 'win32' ? '.exe' : '.dmg'"
+                            :accept="data.platform === 'win32' ? '.zip' : '.dmg'"
                             @select="(file) => (data.full_file = file)"
                         />
                         <NEllipsis v-if="data.full_file">{{ data.full_file.name }}</NEllipsis>
                     </NFlex>
                 </NFormItem>
             </NCol>
-            <template v-if="data.platform === 'win32'">
-                <NCol v-if="data.full_file" :span="24">
-                    <NFormItem label="全量安装包Blockmap" :required="true">
-                        <NFlex :wrap="false" align="center" :style="{ flex: 1 }">
-                            <FilePicker
-                                accept=".blockmap"
-                                @select="(file) => (data.full_blockmap = file)"
-                            />
-                            <NEllipsis v-if="data.full_blockmap">{{
-                                data.full_blockmap.name
-                            }}</NEllipsis>
-                        </NFlex>
-                    </NFormItem>
-                </NCol>
-            </template>
-            <template v-else>
+            <template v-if="data.full_file">
                 <NCol :span="24">
-                    <NFormItem label="更新包" :required="!data.id">
+                    <NFormItem label="更新包" :required="!data.hot_update_info">
                         <NFlex align="center">
                             <FilePicker
-                                accept=".zip"
+                                :accept="data.platform === 'win32' ? '.exe' : '.zip'"
                                 @select="(file) => (data.hot_update_file = file)"
                             />
                             <NEllipsis v-if="data.hot_update_file">{{
@@ -110,10 +95,10 @@ const props = defineProps({
                         <NFlex align="center">
                             <FilePicker
                                 accept=".blockmap"
-                                @select="(file) => (data.hot_update_file = file)"
+                                @select="(file) => (data.hot_update_blockmap = file)"
                             />
-                            <NEllipsis v-if="data.hot_update_file">{{
-                                data.hot_update_file.name
+                            <NEllipsis v-if="data.hot_update_blockmap">{{
+                                data.hot_update_blockmap.name
                             }}</NEllipsis>
                         </NFlex>
                     </NFormItem>

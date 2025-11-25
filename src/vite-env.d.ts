@@ -359,7 +359,8 @@ declare interface ClientVersion {
 }
 
 declare interface ClientPackage {
-    url: string
+    path: string
+    url?: string
     hash: string
     size: number
     blockmap?: string
@@ -368,10 +369,17 @@ declare interface ClientPackage {
 declare interface DesktopClientVersion extends ClientVersion {
     full_info?: ClientPackage
     hot_update_info?: ClientPackage
+    zip_info?: ClientPackage
     full_file?: File
     full_blockmap?: File
     hot_update_file?: File
     hot_update_blockmap?: File
+    zip_file?: File
+}
+
+declare interface DesktopClientVersionInList extends DesktopClientVersion {
+    created_at: string
+    updated_at: string
 }
 
 declare interface RemoteFile {

@@ -4,16 +4,21 @@ import { ActionModal } from '@/components/modal'
 import PageGrid from '@/components/PageGrid.vue'
 import { api, upload } from '@/libs/api'
 import { useListLoader } from '@/libs/loader'
+import { sha512File } from '@/libs/sha512'
+import dayjs from 'dayjs'
 import {
+    NA,
     NButton,
+    NDataTable,
+    NDropdown,
+    NFlex,
     NForm,
     NFormItem,
     NPagination,
     NSelect,
-    NDataTable,
-    type DataTableColumn,
-    NDropdown,
+    NText,
     useMessage,
+    type DataTableColumn,
 } from 'naive-ui'
 import { reactive } from 'vue'
 
@@ -32,7 +37,7 @@ const activeFilter: Filter = {
     arch: 'x64',
 }
 
-const { list, load, loading, pagination } = useListLoader<DesktopClientVersion>({
+const { list, load, loading, pagination, page } = useListLoader<DesktopClientVersionInList>({
     loader: (params) =>
         api({
             url: '/admin/version/list',
@@ -49,7 +54,7 @@ const applyFilter = () => {
     load(1)
 }
 
-const columns: DataTableColumn<DesktopClientVersion>[] = [
+const columns: DataTableColumn<DesktopClientVersionInList>[] = [
     {
         key: 'platform',
         title: '平台',
@@ -65,13 +70,50 @@ const columns: DataTableColumn<DesktopClientVersion>[] = [
     {
         key: 'status',
         title: '状态',
+        render: (row) =>
+            row.status === 1 ? (
+                <NText type="success">已发布</NText>
+            ) : (
+                <NText type="error">未发布</NText>
+            ),
     },
     {
-        key: 'full_url',
-        title: '完整包下载地址',
+        key: 'full_info',
+        title: '完整安装包',
+        render: (row) => (
+            <NA href={row.full_info?.url} target="_blank">
+                点击下载
+            </NA>
+        ),
+    },
+    {
+        key: 'hot_update_info',
+        title: '更新包',
+        render: (row) => (
+            <NA href={row.hot_update_info?.url} target="_blank">
+                点击下载
+            </NA>
+        ),
+    },
+    {
+        key: 'created_at',
+        title: '创建时间',
+        render: (row) => dayjs(row.created_at).format('YYYY-MM-DD HH:mm:ss'),
+    },
+    {
+        key: 'updated_at',
+        title: '更新时间',
+        render: (row) => dayjs(row.updated_at).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
         key: 'actions',
+        render: (row) => (
+            <NFlex>
+                <NButton size="tiny" type="primary" onClick={() => editVersion(row)}>
+                    编辑
+                </NButton>
+            </NFlex>
+        ),
     },
 ]
 
@@ -93,6 +135,20 @@ const createVersion = (platform: 'win32' | 'darwin') => {
     editModal.show = true
 }
 
+const editVersion = (raw: DesktopClientVersion) => {
+    const data = { ...raw }
+    delete data.full_info
+    delete data.hot_update_info
+    editModal.data = data
+    editModal.show = true
+}
+
+const uploading = reactive({
+    uploading: false,
+    title: '',
+    percent: 0,
+})
+
 const message = useMessage()
 /**
  * 保存版本
@@ -105,45 +161,116 @@ const saveVersion = async () => {
         return
     }
 
-    if (!version.id && !version.full_file) {
-        message.warning('请上传全量安装包')
-        return
-    }
-
-    if (version.platform === 'win32') {
-        if (version.full_file && !version.full_blockmap) {
-            message.warning('请上传全量安装包blockmap')
+    if (!version.id) {
+        if (!version.full_info && !version.full_file) {
+            message.warning('请上传全量安装包')
             return
         }
-    } else {
-        if (!version.id && !version.hot_update_file) {
+
+        if (!version.hot_update_info && !version.hot_update_file) {
             message.warning('请上传更新包')
             return
         }
+    }
 
-        if (version.hot_update_file && !version.hot_update_blockmap) {
-            message.warning('请上传更新包blockmap')
-            return
-        }
+    if (version.hot_update_file && !version.hot_update_blockmap) {
+        message.warning('请上传更新包blockmap')
+        return
     }
 
     editModal.sending = true
+    uploading.uploading = false
 
     //开始上传
-    // if (version.full_file) {
-    //     const ret = await upload({
-    //         file: version.full_file,
-    //         type: 'update',
-    //         onProgress: (evt) => console.log(evt),
-    //     })
-    // }
+    if (version.full_file) {
+        uploading.percent = 0
+        uploading.uploading = true
 
-    if (version.full_blockmap) {
-        const ret = await upload({
-            file: version.full_blockmap,
-            type: 'update',
-            onProgress: (evt) => console.log(evt),
+        const hot_update_file = version.hot_update_file!
+        const hot_update_blockmap = version.hot_update_blockmap!
+
+        uploading.title = '更新包上传中'
+        uploading.percent = 0
+
+        const retHotUpdate = await upload({
+            file: hot_update_file,
+            type: 'temp',
+            onProgress: (evt) => {
+                uploading.percent = Math.floor((evt.loaded * 100) / evt.total)
+            },
         })
+
+        if (retHotUpdate.code) {
+            editModal.sending = false
+            message.error(retHotUpdate.msg)
+            return
+        }
+
+        uploading.percent = 100
+
+        const retHotUpdateBlockmap = await upload({
+            file: hot_update_blockmap,
+            type: 'temp',
+        })
+
+        if (retHotUpdateBlockmap.code) {
+            editModal.sending = false
+            message.error(retHotUpdateBlockmap.msg)
+            return
+        }
+
+        uploading.title = '更新包hash计算中'
+        uploading.percent = 0
+        const hash = await sha512File(hot_update_file)
+
+        version.hot_update_info = {
+            path: retHotUpdate.data.path,
+            hash,
+            size: hot_update_file.size,
+            blockmap: retHotUpdateBlockmap.data.path,
+        }
+        delete version.hot_update_file
+        delete version.hot_update_blockmap
+
+        uploading.title = '全量安装包上传中'
+        uploading.percent = 0
+
+        const retFull = await upload({
+            file: version.full_file,
+            type: 'temp',
+            onProgress: (evt) => {
+                uploading.percent = Math.floor((evt.loaded * 100) / evt.total)
+            },
+        })
+        if (retFull.code) {
+            editModal.sending = false
+            message.error(retFull.msg)
+            return
+        }
+
+        version.full_info = {
+            path: retFull.data.path,
+            size: version.full_file.size,
+            hash: '',
+        }
+
+        delete version.full_file
+        uploading.percent = 100
+    }
+
+    //提交数据
+    const ret = await api({
+        url: '/admin/version/save_desktop',
+        data: version,
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+    } else {
+        message.success('保存成功')
+        editModal.show = false
+        if (page.value === 1) {
+            load(1)
+        }
     }
 
     editModal.sending = false
@@ -222,5 +349,15 @@ const saveVersion = async () => {
         @positiveClick="saveVersion"
     >
         <DesktopClientVersionEditor :data="editModal.data" :disabled="editModal.sending" />
+        <template #actionExtra>
+            <div v-if="uploading.uploading" class="progress">
+                {{ uploading.title }} {{ uploading.percent }}%
+            </div>
+        </template>
     </ActionModal>
 </template>
+<style lang="less" scoped>
+.progress {
+    flex: 1;
+}
+</style>
