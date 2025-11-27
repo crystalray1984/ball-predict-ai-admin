@@ -162,6 +162,7 @@ const columns: DataTableColumn<Match>[] = [
         key: 'actions',
         title: '操作',
         align: 'center',
+        width: 300,
         render: (row) => {
             return (
                 <NFlex align="center" size="small">
@@ -186,6 +187,14 @@ const columns: DataTableColumn<Match>[] = [
                         onClick={() => createSinglePromote(row)}
                     >
                         手动推荐
+                    </NButton>
+                    <NButton
+                        type="info"
+                        ghost={true}
+                        size="small"
+                        onClick={() => openMatchTimerChange(row)}
+                    >
+                        修改比赛时间
                     </NButton>
                 </NFlex>
             )
@@ -263,6 +272,44 @@ const submitSinglePromote = async () => {
         message.success('添加推荐成功')
         singlePromoteModal.sending = singlePromoteModal.show = false
     }
+}
+
+const changeTimeModal = reactive({
+    show: false,
+    data: Date.now(),
+    match: null as unknown as Match,
+    sending: false,
+})
+
+const openMatchTimerChange = (match: Match) => {
+    changeTimeModal.match = match
+    changeTimeModal.data = dayjs(match.match_time).valueOf()
+    changeTimeModal.show = true
+}
+
+const submitMatchTime = async () => {
+    if (changeTimeModal.data === dayjs(changeTimeModal.match.match_time).valueOf()) {
+        //没有修改
+        changeTimeModal.show = false
+        return
+    }
+
+    changeTimeModal.sending = true
+    const ret = await api({
+        url: '/admin/match/set_time',
+        data: {
+            id: changeTimeModal.match.id,
+            match_time: changeTimeModal.data,
+        },
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+    } else {
+        message.success('修改成功')
+        changeTimeModal.match.match_time = dayjs(changeTimeModal.data).toISOString()
+        changeTimeModal.show = false
+    }
+    changeTimeModal.sending = false
 }
 </script>
 <template>
@@ -370,6 +417,39 @@ const submitSinglePromote = async () => {
                         </NFormItem>
                     </NCol>
                 </NRow>
+            </NFlex>
+        </NForm>
+    </ActionModal>
+
+    <ActionModal
+        title="修改比赛时间"
+        v-model:show="changeTimeModal.show"
+        :data="changeTimeModal.match"
+        :sending="changeTimeModal.sending"
+        @positiveClick="submitMatchTime"
+        :style="{ width: '400px' }"
+    >
+        <NForm
+            labelPlacement="left"
+            labelWidth="80px"
+            :disabled="changeTimeModal.sending"
+            :showFeedback="false"
+        >
+            <NFlex :vertical="true" size="large">
+                <NFormItem label="对阵球队"
+                    >{{ changeTimeModal.match.team1.name }} vs
+                    {{ changeTimeModal.match.team2.name }}</NFormItem
+                >
+                <NFormItem label="原比赛时间">{{
+                    dateTime(changeTimeModal.match.match_time)
+                }}</NFormItem>
+                <NFormItem label="新比赛时间">
+                    <NDatePicker
+                        type="datetime"
+                        v-model:value="changeTimeModal.data"
+                        :inputReadonly="true"
+                    />
+                </NFormItem>
             </NFlex>
         </NForm>
     </ActionModal>
