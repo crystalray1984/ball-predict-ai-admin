@@ -57,6 +57,7 @@ interface OddData extends OddInfo {
         final_rule: string
         created_at: string
         value: string
+        duration: number
     } & OddInfo
     has_score: number
     has_period1_score: number
@@ -327,6 +328,11 @@ const columns: DataTableColumn<OddData>[] = [
             if (!row.promoted) return
             return dateTime(row.promoted.created_at, 'M/D H:mm')
         },
+    },
+    {
+        key: 'promoted.duration',
+        title: '距离开赛',
+        width: 80,
     },
     {
         key: 'promote',
