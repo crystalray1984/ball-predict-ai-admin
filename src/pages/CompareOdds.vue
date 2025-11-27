@@ -58,6 +58,8 @@ interface OddData extends OddInfo {
         created_at: string
         value: string
         duration: number
+        value0: string
+        value1: string
     } & OddInfo
     has_score: number
     has_period1_score: number
@@ -266,12 +268,6 @@ const columns: DataTableColumn<OddData>[] = [
         },
     },
     {
-        key: 'surebet_value',
-        title: '推送水位',
-        width: 70,
-        render: (row) => Decimal(row.surebet_value).toFixed(4),
-    },
-    {
         key: 'created_at',
         title: '一次比对时间',
         width: 90,
@@ -366,12 +362,30 @@ const columns: DataTableColumn<OddData>[] = [
         },
     },
     {
+        key: 'promoted_value0',
+        title: '正推水位',
+        width: 70,
+        render: (row) => {
+            if (!row.promoted) return
+            return Decimal(row.promoted.value0).toDP(4).toString()
+        },
+    },
+    {
+        key: 'promoted_value1',
+        title: '反推水位',
+        width: 70,
+        render: (row) => {
+            if (!row.promoted) return
+            return Decimal(row.promoted.value1).toDP(4).toString()
+        },
+    },
+    {
         key: 'promoted_value',
         title: '推荐水位',
         width: 100,
         render: (row) => {
             if (!row.promoted) return
-            return Number(row.promoted.value)
+            return Decimal(row.promoted.value).toDP(4).toString()
         },
     },
     {
