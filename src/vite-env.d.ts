@@ -192,6 +192,9 @@ declare interface Setting {
 
     surebet_v2_to_v3_back: number
     surebet_v2_to_v3_min_value: string
+
+    mansion_min_value: string
+    mansion_max_value: string
 }
 
 declare interface SpecialConfig {

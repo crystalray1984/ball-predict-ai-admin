@@ -139,6 +139,20 @@ const saveSettings = async () => {
                                 />
                             </NFormItem>
 
+                            <NFormItem label="对比推荐水位范围">
+                                <NInputGroup>
+                                    <NInput
+                                        v-model:value="settings.mansion_min_value"
+                                        placeholder=""
+                                    />
+                                    <NInputGroupLabel> - </NInputGroupLabel>
+                                    <NInput
+                                        v-model:value="settings.mansion_max_value"
+                                        placeholder=""
+                                    />
+                                </NInputGroup>
+                            </NFormItem>
+
                             <NFormItem label="滚球采集规则">
                                 <RockballConfigEditor
                                     :list="settings.rockball_config"
