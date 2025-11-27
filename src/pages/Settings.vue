@@ -6,6 +6,7 @@ import { pick } from 'lodash-es'
 import {
     NButton,
     NCard,
+    NCheckbox,
     NCol,
     NFlex,
     NForm,
@@ -17,6 +18,8 @@ import {
     NRadio,
     NRadioGroup,
     NRow,
+    NSwitch,
+    NTable,
     useMessage,
 } from 'naive-ui'
 import { onMounted, ref, type Ref } from 'vue'
@@ -140,22 +143,75 @@ const saveSettings = async () => {
                             </NFormItem>
 
                             <NFormItem label="对比推荐水位范围">
-                                <NInputGroup style="width: 400px">
-                                    <NInput
-                                        v-model:value="settings.mansion_promote_min_value"
-                                        placeholder=""
-                                    />
-                                    <NInputGroupLabel>正推范围</NInputGroupLabel>
-                                    <NInput
-                                        v-model:value="settings.mansion_promote_middle_value"
-                                        placeholder=""
-                                    />
-                                    <NInputGroupLabel>反推范围</NInputGroupLabel>
-                                    <NInput
-                                        v-model:value="settings.mansion_promote_max_value"
-                                        placeholder=""
-                                    />
-                                </NInputGroup>
+                                <NTable :singleLine="false" size="small" style="width: auto">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>下限</th>
+                                            <th></th>
+                                            <th>中间点</th>
+                                            <th></th>
+                                            <th>上限</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <NCheckbox
+                                                    v-model:checked="
+                                                        settings.mansion_promote_reverse
+                                                    "
+                                                    >交换正反推</NCheckbox
+                                                >
+                                            </td>
+                                            <td>
+                                                <NInput
+                                                    v-model:value="
+                                                        settings.mansion_promote_min_value
+                                                    "
+                                                    placeholder=""
+                                                    style="width: 100px"
+                                                />
+                                            </td>
+                                            <td>
+                                                ≤
+                                                {{
+                                                    settings.mansion_promote_reverse
+                                                        ? '反推'
+                                                        : '正推'
+                                                }}
+                                                ≤
+                                            </td>
+                                            <td>
+                                                <NInput
+                                                    v-model:value="
+                                                        settings.mansion_promote_middle_value
+                                                    "
+                                                    placeholder=""
+                                                    style="width: 100px"
+                                                />
+                                            </td>
+                                            <td>
+                                                <
+                                                {{
+                                                    settings.mansion_promote_reverse
+                                                        ? '正推'
+                                                        : '反推'
+                                                }}
+                                                ≤
+                                            </td>
+                                            <td>
+                                                <NInput
+                                                    v-model:value="
+                                                        settings.mansion_promote_max_value
+                                                    "
+                                                    placeholder=""
+                                                    style="width: 100px"
+                                                />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </NTable>
                             </NFormItem>
 
                             <NFormItem label="滚球采集规则">

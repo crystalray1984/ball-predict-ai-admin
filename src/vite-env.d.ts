@@ -193,6 +193,7 @@ declare interface Setting {
     surebet_v2_to_v3_back: number
     surebet_v2_to_v3_min_value: string
 
+    mansion_promote_reverse: boolean
     mansion_promote_min_value: string
     mansion_promote_middle_value: string
     mansion_promote_max_value: string
