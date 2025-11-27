@@ -140,14 +140,19 @@ const saveSettings = async () => {
                             </NFormItem>
 
                             <NFormItem label="对比推荐水位范围">
-                                <NInputGroup>
+                                <NInputGroup style="width: 400px">
                                     <NInput
-                                        v-model:value="settings.mansion_min_value"
+                                        v-model:value="settings.mansion_promote_min_value"
                                         placeholder=""
                                     />
-                                    <NInputGroupLabel> - </NInputGroupLabel>
+                                    <NInputGroupLabel>正推范围</NInputGroupLabel>
                                     <NInput
-                                        v-model:value="settings.mansion_max_value"
+                                        v-model:value="settings.mansion_promote_middle_value"
+                                        placeholder=""
+                                    />
+                                    <NInputGroupLabel>反推范围</NInputGroupLabel>
+                                    <NInput
+                                        v-model:value="settings.mansion_promote_max_value"
                                         placeholder=""
                                     />
                                 </NInputGroup>
