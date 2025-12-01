@@ -65,7 +65,7 @@ const onToggleOpen = async (item: Tournament, is_open: number) => {
             is_open,
         },
     })
-    item.is_open = 1 - item.is_open
+    item.is_open = is_open
     item.is_updating = false
 }
 
@@ -78,7 +78,7 @@ const onToggleRockballOpen = async (item: Tournament, is_open: number) => {
             is_rockball_open: is_open,
         },
     })
-    item.is_rockball_open = 1 - item.is_open
+    item.is_rockball_open = is_open
     item.is_updating = false
 }
 
