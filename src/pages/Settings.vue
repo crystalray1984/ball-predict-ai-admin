@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import DirectConfigEditor from '@/components/DirectConfigEditor.vue'
 import RockballConfigEditor from '@/components/RockballConfigEditor.vue'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
@@ -218,6 +219,18 @@ const saveSettings = async () => {
                                     :list="settings.rockball_config"
                                     :disabled="loading"
                                 />
+                            </NFormItem>
+
+                            <NFormItem label="推送直通规则">
+                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
+                                    <DirectConfigEditor
+                                        :list="settings.direct_config"
+                                        :disabled="loading"
+                                    />
+                                    <span>
+                                        规则越靠前，优先级越高，一旦触发一个规则就直接进入推荐
+                                    </span>
+                                </NFlex>
                             </NFormItem>
                         </NFlex>
                     </NForm>

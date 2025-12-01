@@ -24,6 +24,7 @@ declare interface Tournament {
     id: number
     name: string
     is_open: number
+    is_rockball_open: number
     label_id: number
     label_title: string
     is_updating?: boolean

@@ -5,26 +5,24 @@ import {
     ODD_TYPE_TEXT,
     PERIOD_TEXT,
     VARIETY_TEXT,
-    PUBLISH_CHANNELS,
 } from '@/libs/helpers'
 import { ArrowDownOutlined, ArrowUpOutlined, CloseCircleOutlined } from '@vicons/antd'
 import Decimal from 'decimal.js'
 import { eq } from 'lodash-es'
 import {
     NButton,
+    NCheckbox,
     NDataTable,
     NFlex,
     NForm,
     NFormItem,
     NIcon,
     NInputGroup,
+    NRadio,
+    NRadioGroup,
     NSelect,
     useMessage,
-    NRadioGroup,
-    NRadio,
     type DataTableColumn,
-    NCheckbox,
-    NCheckboxGroup,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
 import { reactive, type PropType } from 'vue'
@@ -89,14 +87,6 @@ const columns: DataTableColumn<DirectConfig>[] = [
                 title: '一次比对',
                 render: (row) => (row.first_check ? '需要' : ''),
             },
-            // {
-            //     key: 'value',
-            //     title: '水位',
-            //     render: (row) =>
-            //         !isNullOrUndefined(row.value_symbol) && !isNullOrUndefined(row.value)
-            //             ? `${row.value_symbol} ${row.value}`
-            //             : '-',
-            // },
         ],
     },
     {
@@ -112,11 +102,6 @@ const columns: DataTableColumn<DirectConfig>[] = [
                 key: 'adjust',
                 title: '变盘',
                 render: (row) => numberWithSymbol(row.adjust),
-            },
-            {
-                key: 'publish_channels',
-                title: '推送',
-                render: (row) => row.publish_channels.map((channel) => PUBLISH_CHANNELS[channel]),
             },
         ],
     },
@@ -204,7 +189,7 @@ const add = () => {
         back: false,
         value: '0',
         first_check: true,
-        publish_channels: ['channel1'],
+        publish_channels: [],
     }
     addModal.show = true
 }
@@ -234,12 +219,6 @@ const submitAdd = () => {
 
     if (exists) {
         message.warning('已经存在相同条件的规则')
-        return
-    }
-
-    //通道检查
-    if (addModal.data.publish_channels.length === 0) {
-        message.warning('需要选择至少1个推送通道')
         return
     }
 
@@ -337,18 +316,13 @@ const submitAdd = () => {
                         </NRadioGroup>
                     </NFormItem>
                     <NFormItem label="推荐变盘">
-                        <NSelect v-model:value="addModal.data.adjust" :options="adjustOptions" />
-                    </NFormItem>
-                    <NFormItem label="推送通道">
-                        <NCheckboxGroup v-model:value="addModal.data.publish_channels">
-                            <NCheckbox
-                                v-for="(name, key) in PUBLISH_CHANNELS"
-                                :key="key"
-                                :value="key"
-                            >
-                                {{ name }}
-                            </NCheckbox>
-                        </NCheckboxGroup>
+                        <NFlex :vertical="true">
+                            <NSelect
+                                v-model:value="addModal.data.adjust"
+                                :options="adjustOptions"
+                            />
+                            <div class="form-text">在正反推确定之后进行变盘</div>
+                        </NFlex>
                     </NFormItem>
                 </NFlex>
             </NForm>
