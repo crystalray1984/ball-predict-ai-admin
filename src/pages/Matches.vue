@@ -40,8 +40,8 @@ interface Filter {
     dates?: [number, number]
 }
 
-const start = dayjs().subtract(6, 'day').startOf('day')
-const end = dayjs().add(1, 'day').startOf('day')
+const start = dayjs().subtract(1, 'day').startOf('day')
+const end = dayjs().startOf('day')
 
 const filter = reactive<Filter>({
     tournament_id: undefined,

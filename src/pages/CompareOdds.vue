@@ -69,8 +69,8 @@ interface OddData extends OddInfo {
     is_updating?: boolean
 }
 
-const start = dayjs().startOf('day')
-const end = dayjs().add(1, 'day').startOf('day')
+const start = dayjs().subtract(1, 'day').startOf('day')
+const end = dayjs().startOf('day')
 const message = useMessage()
 
 const filter = reactive<Filter>({

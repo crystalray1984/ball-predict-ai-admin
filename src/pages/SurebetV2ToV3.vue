@@ -75,8 +75,8 @@ interface SummaryData {
 }
 
 const message = useMessage()
-const start = dayjs().startOf('day')
-const end = dayjs().add(1, 'day').startOf('day')
+const start = dayjs().subtract(1, 'day').startOf('day')
+const end = dayjs().startOf('day')
 const filter = reactive<Filter>({
     dates: [start.valueOf(), end.valueOf()],
     order: 'promote_time',
