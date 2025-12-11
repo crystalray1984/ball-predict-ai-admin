@@ -214,6 +214,7 @@ declare interface SpecialEnable extends Partial<OddInfo> {
     id: string | number
     condition_symbol?: '>=' | '>' | '<=' | '<' | '='
     condition: string
+    condition2?: string
 }
 
 /**

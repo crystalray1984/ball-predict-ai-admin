@@ -15,10 +15,13 @@ import {
     NInputGroupLabel,
     NSelect,
     useMessage,
+    NRow,
+    NCol,
     type DataTableColumn,
+    NCheckbox,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
-import { reactive, type PropType } from 'vue'
+import { computed, reactive, type PropType } from 'vue'
 import ConditionSelect from './ConditionSelect'
 import { ActionModal } from './modal'
 
@@ -56,10 +59,13 @@ const columns: DataTableColumn<RockballConfig>[] = [
     {
         key: 'condition',
         title: '盘口',
-        render: (row) =>
-            !isNullOrUndefined(row.condition_symbol) && !isNullOrUndefined(row.condition)
-                ? `${row.condition_symbol} ${row.condition}`
-                : '-',
+        render: (row) => {
+            if (typeof row.condition2 !== 'undefined') {
+                return `${row.condition} - ${row.condition2}`
+            } else {
+                return row.condition
+            }
+        },
     },
     {
         key: 'value',
@@ -155,6 +161,21 @@ const add = () => {
     addModal.show = true
 }
 
+const isConditionRange = computed({
+    get() {
+        if (!addModal.data) return false
+        return typeof addModal.data.condition2 !== 'undefined'
+    },
+    set(value: boolean) {
+        if (!addModal.data) return
+        if (!value) {
+            addModal.data.condition2 = undefined
+        } else {
+            addModal.data.condition2 = '0.25'
+        }
+    },
+})
+
 const message = useMessage()
 
 const submitAdd = () => {
@@ -168,17 +189,53 @@ const submitAdd = () => {
         return
     }
 
+    if (typeof addModal.data.condition2 !== 'undefined') {
+        if (Decimal(addModal.data.condition2).lte(addModal.data.condition)) {
+            message.warning('盘口条件是范围时，左边的值必须小于右边的值')
+            return
+        }
+    }
+
     //重复检查
     const exists = props.list.find((rule) => {
         if (!eq(rule.variety, addModal.data.variety)) return false
         if (!eq(rule.period, addModal.data.period)) return false
         if (!eq(rule.type, addModal.data.type)) return false
         if (!eq(rule.condition_symbol, addModal.data.condition_symbol)) return false
-        return Decimal(rule.condition).eq(addModal.data.condition)
+        if (typeof addModal.data.condition2 === 'undefined') {
+            //当前规则盘口是固定值
+            if (typeof rule.condition2 === 'undefined') {
+                //对比规则的盘口是固定值
+                return Decimal(rule.condition).eq(addModal.data.condition)
+            } else {
+                //对比规则的盘口是范围
+                return (
+                    Decimal(rule.condition).lte(addModal.data.condition) &&
+                    Decimal(rule.condition2).gte(addModal.data.condition)
+                )
+            }
+        } else {
+            //当前规则盘口是固定值
+            if (typeof rule.condition2 === 'undefined') {
+                //对比规则的盘口是固定值
+                return (
+                    Decimal(rule.condition).gte(addModal.data.condition) &&
+                    Decimal(rule.condition).lte(addModal.data.condition2)
+                )
+            } else {
+                //对比规则的盘口是范围
+                return (
+                    (Decimal(rule.condition).gte(addModal.data.condition) &&
+                        Decimal(rule.condition).lte(addModal.data.condition2)) ||
+                    (Decimal(rule.condition2).gte(addModal.data.condition) &&
+                        Decimal(rule.condition2).lte(addModal.data.condition2))
+                )
+            }
+        }
     })
 
     if (exists) {
-        message.warning('已经存在相同条件的规则')
+        message.warning('已经存在条件重叠的规则')
         return
     }
 
@@ -274,10 +331,24 @@ const submitAddOdd = () => {
                         <NSelect v-model:value="addModal.data.type" :options="oddTypeOptions" />
                     </NFormItem>
                     <NFormItem label="盘口条件">
-                        <ConditionSelect
-                            v-model:value="addModal.data.condition"
-                            :oddType="addModal.data.type"
-                        />
+                        <NRow :gutter="12" alignItems="center">
+                            <NCol :span="9">
+                                <ConditionSelect
+                                    v-model:value="addModal.data.condition"
+                                    :oddType="addModal.data.type"
+                                />
+                            </NCol>
+                            <NCol :span="6">
+                                <NCheckbox v-model:checked="isConditionRange">范围</NCheckbox>
+                            </NCol>
+                            <NCol :span="9">
+                                <ConditionSelect
+                                    v-model:value="addModal.data.condition2"
+                                    :oddType="addModal.data.type"
+                                    :disabled="!isConditionRange"
+                                />
+                            </NCol>
+                        </NRow>
                     </NFormItem>
                     <NFormItem label="水位条件">
                         <NInputGroup>
