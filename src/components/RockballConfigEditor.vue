@@ -91,7 +91,7 @@ const columns: DataTableColumn<RockballConfig>[] = [
                             size="tiny"
                             type="error"
                             text={true}
-                            onClick={() => row.odds.splice(index)}
+                            onClick={() => row.odds.splice(index, 1)}
                         >
                             {{
                                 icon: () => (
