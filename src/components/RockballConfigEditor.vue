@@ -1,10 +1,12 @@
 <script lang="tsx" setup>
 import { isNullOrUndefined, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
-import { CloseCircleOutlined } from '@vicons/antd'
+import { CloseCircleOutlined, EditOutlined } from '@vicons/antd'
 import Decimal from 'decimal.js'
 import { eq } from 'lodash-es'
 import {
     NButton,
+    NCheckbox,
+    NCol,
     NDataTable,
     NFlex,
     NForm,
@@ -13,12 +15,13 @@ import {
     NInput,
     NInputGroup,
     NInputGroupLabel,
-    NSelect,
-    useMessage,
+    NRadio,
+    NRadioGroup,
     NRow,
-    NCol,
+    NSelect,
+    NText,
+    useMessage,
     type DataTableColumn,
-    NCheckbox,
 } from 'naive-ui'
 import { nanoid } from 'nanoid'
 import { computed, reactive, type PropType } from 'vue'
@@ -75,24 +78,28 @@ const columns: DataTableColumn<RockballConfig>[] = [
     {
         key: 'odds',
         title: '追踪盘口',
-        // render: (row) => {
-        //     if (row.odds.length === 0) return
-        //     return (
-        //         <NList>
-        //             {row.odds.map((odd) => (
-        //                 <NListItem key={odd.id}>abc</NListItem>
-        //             ))}
-        //         </NList>
-        //     )
-        // },
         render: (row) => (
             <NFlex vertical={true} inline={false}>
                 {row.odds.map((odd, index) => (
                     <NFlex key={odd.id} align="center">
-                        <span>
+                        <NText delete={odd.disabled}>
                             {PERIOD_TEXT[odd.period]} {ODD_TYPE_TEXT[odd.type]} {odd.condition}{' '}
                             {`水位≥${odd.value}`}
-                        </span>
+                        </NText>
+                        <NButton
+                            size="tiny"
+                            type="info"
+                            text={true}
+                            onClick={() => editOdd(odd, row)}
+                        >
+                            {{
+                                icon: () => (
+                                    <NIcon>
+                                        <EditOutlined />
+                                    </NIcon>
+                                ),
+                            }}
+                        </NButton>
                         <NButton
                             size="tiny"
                             type="error"
@@ -254,7 +261,15 @@ const addOdd = (target: RockballConfig) => {
         type: undefined as unknown as OddType,
         condition: '0',
         value: '1.00',
+        disabled: false,
     }
+    addOddModal.show = true
+}
+
+const editOdd = (odd: RockballOddInfo, target: RockballConfig) => {
+    addOddModal.target = target
+    addOddModal.data = JSON.parse(JSON.stringify(odd))
+    addOddModal.data.disabled = !!addOddModal.data.disabled
     addOddModal.show = true
 }
 
@@ -276,6 +291,7 @@ const submitAddOdd = () => {
 
     //重复检查
     const exists = addOddModal.target.odds.some((org) => {
+        if (org.id === addOddModal.data.id) return false
         if (!eq(org.variety, addOddModal.data.variety)) return false
         if (!eq(org.period, addOddModal.data.period)) return false
         if (!eq(org.type, addOddModal.data.type)) return false
@@ -286,7 +302,13 @@ const submitAddOdd = () => {
         return
     }
 
-    addOddModal.target.odds.push(addOddModal.data)
+    const index = addOddModal.target.odds.findIndex((t) => t.id === addOddModal.data.id)
+    if (index === -1) {
+        addOddModal.target.odds.push(addOddModal.data)
+    } else {
+        addOddModal.target.odds.splice(index, 1, addOddModal.data)
+    }
+
     addOddModal.show = false
 }
 </script>
@@ -360,7 +382,7 @@ const submitAddOdd = () => {
             </NForm>
         </ActionModal>
         <ActionModal
-            title="添加滚球追踪盘口"
+            title="滚球追踪盘口"
             v-model:show="addOddModal.show"
             :data="addOddModal.data"
             :style="{ width: '400px' }"
@@ -388,6 +410,14 @@ const submitAddOdd = () => {
                             <NInputGroupLabel>≥</NInputGroupLabel>
                             <NInput v-model:value="addOddModal.data.value" />
                         </NInputGroup>
+                    </NFormItem>
+                    <NFormItem label="推送">
+                        <NRadioGroup v-model:value="addOddModal.data.disabled">
+                            <NFlex size="large">
+                                <NRadio :value="false">推送</NRadio>
+                                <NRadio :value="true">不推送</NRadio>
+                            </NFlex>
+                        </NRadioGroup>
                     </NFormItem>
                 </NFlex>
             </NForm>

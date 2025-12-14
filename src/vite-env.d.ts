@@ -354,6 +354,7 @@ declare interface RockballConfig extends SpecialEnable {
 declare interface RockballOddInfo extends OddInfo {
     id: string | number
     value: string
+    disabled: boolean
 }
 
 declare interface ClientVersion {
