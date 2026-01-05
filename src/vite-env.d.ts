@@ -194,7 +194,7 @@ declare interface Setting {
     surebet_v2_to_v3_back: number
     surebet_v2_to_v3_min_value: string
 
-    mansion_promote_reverse: boolean
+    mansion_promote_reverse: SumCondition[]
     mansion_promote_min_value: string
     mansion_promote_middle_value: string
     mansion_promote_max_value: string
@@ -205,6 +205,15 @@ declare interface SpecialConfig {
     back: number
     auto_adjust: number
     enable: boolean
+}
+
+/**
+ * 大球的大小球筛选条件
+ */
+declare interface SumCondition {
+    id: string | number
+    condition_symbol: '>=' | '>' | '<=' | '<' | '='
+    condition: string
 }
 
 /**

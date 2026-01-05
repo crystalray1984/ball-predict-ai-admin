@@ -1,6 +1,7 @@
 <script setup lang="tsx">
 import DirectConfigEditor from '@/components/DirectConfigEditor.vue'
 import RockballConfigEditor from '@/components/RockballConfigEditor.vue'
+import SumConditionEditor from '@/components/SumConditionEditor.vue'
 import { api } from '@/libs/api'
 import { useLoader } from '@/libs/loader'
 import { pick } from 'lodash-es'
@@ -172,6 +173,18 @@ const saveSettings = async () => {
                                         </tr>
                                     </tbody>
                                 </NTable>
+                            </NFormItem>
+
+                            <NFormItem label="对比推荐小球规则">
+                                <NFlex :vertical="true" :inline="false" :style="{ flex: 1 }">
+                                    <SumConditionEditor
+                                        :list="settings.mansion_promote_reverse"
+                                        :disabled="loading"
+                                    />
+                                    <span
+                                        >对比默认推大球，如果采集到的大小球主盘满足以下条件之一则推小球</span
+                                    >
+                                </NFlex>
                             </NFormItem>
 
                             <NFormItem label="滚球采集规则">
