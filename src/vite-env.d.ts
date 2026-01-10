@@ -191,6 +191,11 @@ declare interface Setting {
      */
     rockball_config: RockballConfig[]
 
+    /**
+     * 滚球2采集规则
+     */
+    rockball_config2: RockballConfig[]
+
     surebet_v2_to_v3_back: number
     surebet_v2_to_v3_min_value: string
 
@@ -208,7 +213,7 @@ declare interface SpecialConfig {
 }
 
 /**
- * 大球的大小球筛选条件
+ * 对比的大小球筛选条件
  */
 declare interface SumCondition {
     id: string | number

@@ -18,6 +18,7 @@ import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import Versions from './pages/Versions.vue'
 import VipRecords from './pages/VipRecords.vue'
+import Rockball2 from './pages/Rockball2.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -84,6 +85,10 @@ export const router = createRouter({
                 {
                     path: '/rockball',
                     component: Rockball,
+                },
+                {
+                    path: '/rockball2',
+                    component: Rockball2,
                 },
                 {
                     path: '/versions',

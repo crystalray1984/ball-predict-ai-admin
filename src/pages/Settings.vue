@@ -205,6 +205,14 @@ const saveSettings = async () => {
                                     </span>
                                 </NFlex>
                             </NFormItem>
+
+                            <NFormItem label="滚球2采集规则">
+                                <RockballConfigEditor
+                                    :list="settings.rockball_config2"
+                                    :disabled="loading"
+                                    :allowValue="false"
+                                />
+                            </NFormItem>
                         </NFlex>
                     </NForm>
                 </NCard>

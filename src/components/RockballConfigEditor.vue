@@ -37,13 +37,17 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    allowValue: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 const remove = (index: number) => {
     props.list.splice(index, 1)
 }
 
-const columns: DataTableColumn<RockballConfig>[] = [
+const columns = computed<DataTableColumn<RockballConfig>[]>(() => [
     {
         key: 'period',
         title: '时段',
@@ -74,6 +78,11 @@ const columns: DataTableColumn<RockballConfig>[] = [
         key: 'value',
         title: '水位',
         render: (row) => `≥${row.value}`,
+        cellProps: () => ({
+            style: {
+                display: props.allowValue ? undefined : 'none',
+            },
+        }),
     },
     {
         key: 'odds',
@@ -141,7 +150,7 @@ const columns: DataTableColumn<RockballConfig>[] = [
             </NButton>
         ),
     },
-]
+])
 
 const addModal = reactive({
     show: false,
@@ -162,7 +171,7 @@ const add = () => {
         id: nanoid(),
         condition_symbol: '=',
         condition: '0',
-        value: '1.00',
+        value: props.allowValue ? '1.00' : '0.00',
         odds: [],
     }
     addModal.show = true

@@ -27,6 +27,10 @@ const menuOptions: MenuOption[] = [
         label: '滚球数据',
     },
     {
+        key: '/rockball2',
+        label: '滚球2数据',
+    },
+    {
         key: '/manual_promote',
         label: '手动推荐',
     },

@@ -1,7 +1,6 @@
 <script setup lang="tsx">
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
-import { CHANNELS } from '@/libs/constants'
 import { ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
 import dayjs from 'dayjs'
@@ -68,8 +67,6 @@ interface OddData {
     promoted_value: string | null
 
     updating?: boolean
-
-    source_channel: string
 }
 
 interface SummaryData {
@@ -148,7 +145,7 @@ onBeforeUnmount(() => {
 
 const loadData = async () => {
     const ret = await api<OddData[]>({
-        url: '/admin/rockball/list',
+        url: '/admin/rockball2/list',
         data: activeFilter,
     })
 
@@ -201,13 +198,6 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
                 </NFlex>
             </>
         ),
-    },
-    {
-        key: 'channel_source',
-        title: '来源',
-        width: 70,
-        align: 'center',
-        render: (row) => CHANNELS[row.source_channel] ?? '',
     },
     {
         key: 'source',
