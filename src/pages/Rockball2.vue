@@ -338,7 +338,7 @@ const doExport = () => {
     form.target = '_blank'
     form.method = 'POST'
     form.action = new URL(
-        '/admin/rockball/export',
+        '/admin/rockball2/export',
         import.meta.env.VITE_API_URL || location.href,
     ).href
     form.enctype = 'application/x-www-form-urlencoded'
@@ -359,7 +359,7 @@ const doExport = () => {
 const setIsOpen = async (row: OddData, is_open: number) => {
     row.updating = true
     const ret = await api({
-        url: '/admin/rockball/set_is_open',
+        url: '/admin/rockball2/set_is_open',
         data: {
             id: row.id,
             is_open,
