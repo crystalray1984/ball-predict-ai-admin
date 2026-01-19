@@ -276,6 +276,19 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
         },
     },
     {
+        key: 'is_valid',
+        title: '是否推荐',
+        width: 70,
+        render: (row) => {
+            if (!row.promoted_at) return
+            return row.is_valid ? (
+                <NText type="success">已推荐</NText>
+            ) : (
+                <NText type="error">未推荐</NText>
+            )
+        },
+    },
+    {
         key: 'value',
         title: '推荐水位',
         width: 70,
