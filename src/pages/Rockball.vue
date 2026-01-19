@@ -272,15 +272,18 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
         key: 'is_open',
         title: '是否推送',
         width: 70,
-        render: (row) => (
-            <NSwitch
-                value={row.is_open}
-                checkedValue={1}
-                uncheckedValue={0}
-                disabled={row.updating}
-                onUpdateValue={(is_open: number) => setIsOpen(row, is_open)}
-            />
-        ),
+        render: (row) => {
+            if (row.promoted_at) return
+            return (
+                <NSwitch
+                    value={row.is_open}
+                    checkedValue={1}
+                    uncheckedValue={0}
+                    disabled={row.updating}
+                    onUpdateValue={(is_open: number) => setIsOpen(row, is_open)}
+                />
+            )
+        },
     },
     {
         key: 'value',
