@@ -70,6 +70,8 @@ interface OddData {
     updating?: boolean
 
     source_channel: string
+
+    is_valid: number
 }
 
 interface SummaryData {
@@ -105,7 +107,7 @@ const summary = computed<SummaryData>(() => {
     let loss = 0
     let draw = 0
 
-    const filtered = list.value.filter((t) => !!t.promoted_at)
+    const filtered = list.value.filter((t) => !!t.promoted_at && t.is_valid === 1)
 
     filtered.forEach((row) => {
         if (row.result === 1) {
@@ -474,8 +476,8 @@ const setIsOpen = async (row: OddData, is_open: number) => {
                                     summary.win_rate === 0
                                         ? undefined
                                         : summary.win_rate >= 50
-                                        ? 'success'
-                                        : 'error'
+                                          ? 'success'
+                                          : 'error'
                                 "
                                 >{{ summary.win_rate ?? 0 }}%</NText
                             >
