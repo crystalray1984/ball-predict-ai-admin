@@ -1,4 +1,5 @@
 <script setup lang="tsx">
+import { ActionModal } from '@/components/modal'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
 import { CHANNELS } from '@/libs/constants'
@@ -16,6 +17,7 @@ import {
     NFlex,
     NForm,
     NFormItem,
+    NInput,
     NSelect,
     NStatistic,
     NSwitch,
@@ -72,6 +74,10 @@ interface OddData {
     source_channel: string
 
     is_valid: number
+
+    manual_type: OddType
+
+    note: string
 }
 
 interface SummaryData {
@@ -269,6 +275,15 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
         },
     },
     {
+        key: 'manual_type',
+        title: '手动设置盘口',
+        width: 140,
+        render: (row) => {
+            if (!row.manual_type) return ''
+            return ODD_TYPE_TEXT[row.manual_type]
+        },
+    },
+    {
         key: 'is_open',
         title: '是否推送',
         width: 70,
@@ -350,7 +365,31 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
         },
     },
     {
+        key: 'note',
+        title: 'AI备注',
+    },
+    {
         key: 'actions',
+        render: (row) => {
+            return (
+                <NFlex>
+                    {!row.promoted_at && (
+                        <NButton
+                            type="primary"
+                            size="tiny"
+                            onClick={() => {
+                                manualModal.type = row.manual_type || row.type
+                                manualModal.note = row.note
+                                manualModal.id = row.id
+                                manualModal.show = true
+                            }}
+                        >
+                            手动改盘
+                        </NButton>
+                    )}
+                </NFlex>
+            )
+        },
     },
 ])
 
@@ -397,6 +436,38 @@ const setIsOpen = async (row: OddData, is_open: number) => {
         row.is_open = is_open
     }
     row.updating = false
+}
+
+const manualModal = reactive({
+    show: false,
+    type: '' as unknown as OddType,
+    note: '',
+    sending: false,
+    id: 0,
+})
+
+const submitManual = async () => {
+    manualModal.sending = true
+    const ret = await api({
+        url: '/admin/rockball/adjust',
+        data: {
+            id: manualModal.id,
+            manual_type: manualModal.type,
+            note: manualModal.note,
+        },
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+    } else {
+        manualModal.show = false
+        const row = list.value.find((t) => t.id === manualModal.id)
+        if (row) {
+            row.manual_type = manualModal.type
+            row.note = manualModal.note
+        }
+        message.success('设置成功')
+    }
+    manualModal.sending = false
 }
 </script>
 <template>
@@ -515,6 +586,37 @@ const setIsOpen = async (row: OddData, is_open: number) => {
             maxHeight="100%"
         />
     </PageGrid>
+
+    <ActionModal
+        v-model:show="manualModal.show"
+        title="手动改盘"
+        style="width: 500px"
+        :sending="manualModal.sending"
+        @positiveClick="submitManual"
+    >
+        <NForm :disabled="manualModal.sending" labelPlacement="left" :showFeedback="false">
+            <NFlex :vertical="true" size="large">
+                <NFormItem label="设置方向">
+                    <NSelect
+                        v-model:value="manualModal.type"
+                        :options="[
+                            {
+                                value: 'under',
+                                label: '小球',
+                            },
+                            {
+                                value: 'over',
+                                label: '大球',
+                            },
+                        ]"
+                    />
+                </NFormItem>
+                <NFormItem label="AI备注">
+                    <NInput type="textarea" v-model:value="manualModal.note" />
+                </NFormItem>
+            </NFlex>
+        </NForm>
+    </ActionModal>
 </template>
 <style lang="less" scoped>
 .statisitc-card {
