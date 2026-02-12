@@ -136,6 +136,7 @@ declare interface Match extends MatchScore {
     team2: Team
     has_score: number
     has_period1_score: number
+    error_status: MatchErrorStatus
 }
 
 /**

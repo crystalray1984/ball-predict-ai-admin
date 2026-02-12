@@ -20,13 +20,6 @@ export const PERIOD_TEXT: Record<Period, string> = {
     regularTime: '全场',
 }
 
-export const ERROR_STATUS_TEXT: Record<MatchErrorStatus, string> = {
-    '': '',
-    cancelled: '比赛取消',
-    delayed: '比赛延期',
-    interrupted: '比赛腰斩',
-}
-
 export const FINAL_RULE_TEXT: Record<PromotedFinalRule, string> = {
     '': '',
     titan007: '趋势',
@@ -50,6 +43,13 @@ export const PROMOTE_RULE_TEXT: Record<string, string> = {
 export const PUBLISH_CHANNELS: Record<string, string> = {
     channel1: '通道1',
     channel2: '通道2',
+}
+
+export const MATCH_ERROR_STATUS_TEXT: Record<MatchErrorStatus, string> = {
+    '': '正常',
+    cancelled: '取消',
+    delayed: '推迟',
+    interrupted: '中断',
 }
 
 export function date(input: ConfigType, format = 'YYYY-MM-DD') {

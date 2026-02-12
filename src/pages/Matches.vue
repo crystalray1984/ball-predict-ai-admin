@@ -9,11 +9,13 @@ import {
     date,
     dateTime,
     isNullOrUndefined,
+    MATCH_ERROR_STATUS_TEXT,
     ODD_TYPE_TEXT,
     PERIOD_TEXT,
     VARIETY_TEXT,
 } from '@/libs/helpers'
 import { useListLoader } from '@/libs/loader'
+import { useDialog } from '@/libs/ui'
 import dayjs from 'dayjs'
 import { trim } from 'lodash-es'
 import {
@@ -29,6 +31,7 @@ import {
     NRow,
     NSelect,
     NTag,
+    NText,
     useMessage,
     type DataTableColumn,
 } from 'naive-ui'
@@ -113,6 +116,17 @@ const columns: DataTableColumn<Match>[] = [
         },
     },
     {
+        key: 'error_status',
+        title: '状态',
+        width: 70,
+        render: (row) => {
+            if (!row.error_status) {
+                return <NText type="success">正常</NText>
+            }
+            return <NText type="error">{MATCH_ERROR_STATUS_TEXT[row.error_status]}</NText>
+        },
+    },
+    {
         key: 'score_period1_goal',
         title: '半场比分',
         align: 'center',
@@ -162,7 +176,7 @@ const columns: DataTableColumn<Match>[] = [
         key: 'actions',
         title: '操作',
         align: 'center',
-        width: 300,
+        width: 370,
         render: (row) => {
             return (
                 <NFlex align="center" size="small">
@@ -196,6 +210,16 @@ const columns: DataTableColumn<Match>[] = [
                     >
                         修改比赛时间
                     </NButton>
+                    {!row.error_status && (
+                        <NButton
+                            type="error"
+                            ghost={true}
+                            size="small"
+                            onClick={() => openErrorStatusModal(row)}
+                        >
+                            设置异常状态
+                        </NButton>
+                    )}
                 </NFlex>
             )
         },
@@ -310,6 +334,53 @@ const submitMatchTime = async () => {
         changeTimeModal.show = false
     }
     changeTimeModal.sending = false
+}
+
+const errorStatusModal = reactive({
+    show: false,
+    error_status: '' as MatchErrorStatus,
+    match: null as unknown as Match,
+    sending: false,
+})
+
+const openErrorStatusModal = (row: Match) => {
+    errorStatusModal.match = row
+    errorStatusModal.error_status = row.error_status
+    errorStatusModal.show = true
+}
+
+const errorStatusOptions = Object.entries(MATCH_ERROR_STATUS_TEXT).map(([value, label]) => ({
+    value,
+    label,
+}))
+
+const dialog = useDialog()
+
+const submitErrorStatus = async () => {
+    if (errorStatusModal.error_status) {
+        const close = await dialog.confirm({
+            title: `确认要把这场比赛设置为${MATCH_ERROR_STATUS_TEXT[errorStatusModal.error_status]}？`,
+            content: '设置了异常状态后不可恢复，且影响后续赛果结算',
+        })
+        if (!close) return
+    }
+
+    errorStatusModal.sending = true
+
+    const ret = await api({
+        url: '/admin/match/set_error_status',
+        data: {
+            match_id: errorStatusModal.match.id,
+            error_status: errorStatusModal.error_status,
+        },
+    })
+    if (ret.code) {
+        message.error(ret.msg)
+    } else {
+        errorStatusModal.match.error_status = errorStatusModal.error_status
+        errorStatusModal.show = false
+    }
+    errorStatusModal.sending = false
 }
 </script>
 <template>
@@ -448,6 +519,38 @@ const submitMatchTime = async () => {
                         type="datetime"
                         v-model:value="changeTimeModal.data"
                         :inputReadonly="true"
+                    />
+                </NFormItem>
+            </NFlex>
+        </NForm>
+    </ActionModal>
+
+    <ActionModal
+        title="修改比赛异常状态"
+        v-model:show="errorStatusModal.show"
+        :data="errorStatusModal.match"
+        :sending="errorStatusModal.sending"
+        @positiveClick="submitErrorStatus"
+        :style="{ width: '400px' }"
+    >
+        <NForm
+            labelPlacement="left"
+            labelWidth="80px"
+            :disabled="errorStatusModal.sending"
+            :showFeedback="false"
+        >
+            <NFlex :vertical="true" size="large">
+                <NFormItem label="对阵球队"
+                    >{{ errorStatusModal.match.team1.name }} vs
+                    {{ errorStatusModal.match.team2.name }}</NFormItem
+                >
+                <NFormItem label="比赛时间">{{
+                    dateTime(errorStatusModal.match.match_time)
+                }}</NFormItem>
+                <NFormItem label="异常状态">
+                    <NSelect
+                        v-model:value="errorStatusModal.error_status"
+                        :options="errorStatusOptions"
                     />
                 </NFormItem>
             </NFlex>
