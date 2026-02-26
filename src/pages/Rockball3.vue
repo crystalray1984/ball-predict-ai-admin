@@ -3,5 +3,5 @@ import RockballView from '@/components/RockballView.vue'
 </script>
 
 <template>
-    <RockballView channel="rockball" />
+    <RockballView channel="rockball3" />
 </template>

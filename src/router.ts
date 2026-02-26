@@ -10,6 +10,8 @@ import ManualPromote from './pages/ManualPromote.vue'
 import Matches from './pages/Matches.vue'
 import Odds from './pages/Odds.vue'
 import Rockball from './pages/Rockball.vue'
+import Rockball2 from './pages/Rockball2.vue'
+import Rockball3 from './pages/Rockball3.vue'
 import Settings from './pages/Settings.vue'
 import SurebetRecords from './pages/SurebetRecords.vue'
 import SurebetV2ToV3 from './pages/SurebetV2ToV3.vue'
@@ -84,23 +86,14 @@ export const router = createRouter({
                 {
                     path: '/rockball',
                     component: Rockball,
-                    props: () => ({
-                        channel: 'rockball',
-                    }),
                 },
                 {
                     path: '/rockball2',
-                    component: Rockball,
-                    props: () => ({
-                        channel: 'rockball2',
-                    }),
+                    component: Rockball2,
                 },
                 {
                     path: '/rockball3',
-                    component: Rockball,
-                    props: () => ({
-                        channel: 'rockball3',
-                    }),
+                    component: Rockball3,
                 },
                 {
                     path: '/versions',
