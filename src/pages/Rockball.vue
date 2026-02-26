@@ -88,6 +88,13 @@ interface SummaryData {
     win_rate: number
 }
 
+const props = defineProps({
+    channel: {
+        type: String,
+        default: 'rockball',
+    },
+})
+
 const message = useMessage()
 const start = dayjs().subtract(1, 'day').startOf('day')
 const end = dayjs().startOf('day')
@@ -157,7 +164,10 @@ onBeforeUnmount(() => {
 const loadData = async () => {
     const ret = await api<OddData[]>({
         url: '/admin/rockball/list',
-        data: activeFilter,
+        data: {
+            ...activeFilter,
+            channel: props.channel,
+        },
     })
 
     if (ret.code) {
@@ -397,7 +407,9 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
  * 导出
  */
 const doExport = () => {
-    const params = {}
+    const params = {
+        channel: props.channel,
+    }
     mergeFilter(params)
 
     const form = document.createElement('form')
