@@ -137,6 +137,7 @@ declare interface Match extends MatchScore {
     has_score: number
     has_period1_score: number
     error_status: MatchErrorStatus
+    periods: string
 }
 
 /**

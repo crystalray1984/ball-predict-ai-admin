@@ -11,6 +11,10 @@ const menuOptions: MenuOption[] = [
         label: '概览',
     },
     {
+        key: '/score_miss_matches',
+        label: '赛果缺失列表',
+    },
+    {
         key: '/odds',
         label: '盘口数据',
     },

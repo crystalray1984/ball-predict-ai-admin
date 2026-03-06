@@ -12,6 +12,7 @@ import Odds from './pages/Odds.vue'
 import Rockball from './pages/Rockball.vue'
 import Rockball2 from './pages/Rockball2.vue'
 import Rockball3 from './pages/Rockball3.vue'
+import ScoreMissMatches from './pages/ScoreMissMatches.vue'
 import Settings from './pages/Settings.vue'
 import SurebetRecords from './pages/SurebetRecords.vue'
 import SurebetV2ToV3 from './pages/SurebetV2ToV3.vue'
@@ -50,6 +51,10 @@ export const router = createRouter({
                 {
                     path: '/matches',
                     component: Matches,
+                },
+                {
+                    path: '/score_miss_matches',
+                    component: ScoreMissMatches,
                 },
                 {
                     path: '/settings',
