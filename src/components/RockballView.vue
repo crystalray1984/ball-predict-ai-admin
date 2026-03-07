@@ -279,8 +279,12 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
             }
 
             const promotedText = (() => {
-                const { type } = getReverseOdd({ type: row.type, condition: row.condition })
-                return ODD_TYPE_TEXT[type]
+                if (row.back) {
+                    const { type } = getReverseOdd({ type: row.type, condition: row.condition })
+                    return ODD_TYPE_TEXT[type]
+                } else {
+                    return ODD_TYPE_TEXT[row.type]
+                }
             })()
 
             return (
