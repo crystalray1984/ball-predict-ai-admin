@@ -3,7 +3,7 @@ import { ActionModal } from '@/components/modal'
 import PageGrid from '@/components/PageGrid.vue'
 import { api } from '@/libs/api'
 import { CHANNELS } from '@/libs/constants'
-import { ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
+import { getReverseOdd, ODD_TYPE_TEXT, PERIOD_TEXT, VARIETY_TEXT } from '@/libs/helpers'
 import { useLoader } from '@/libs/loader'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -78,6 +78,8 @@ interface OddData {
     manual_type: OddType
 
     note: string
+
+    back: number
 }
 
 interface SummaryData {
@@ -276,10 +278,20 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
                 texts.push(Decimal(row.condition).toString())
             }
 
+            const promotedText = (() => {
+                const { type } = getReverseOdd({ type: row.type, condition: row.condition })
+                return ODD_TYPE_TEXT[type]
+            })()
+
             return (
                 <>
                     <div>{texts.join(' ')}</div>
                     <div>{'水位≥' + Number(row.value)}</div>
+                    <div>
+                        <NTag size="tiny" type="error">
+                            {promotedText}
+                        </NTag>
+                    </div>
                 </>
             )
         },
