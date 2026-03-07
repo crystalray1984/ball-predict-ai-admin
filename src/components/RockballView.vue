@@ -278,23 +278,26 @@ const columns = computed<DataTableColumn<OddData>[]>(() => [
                 texts.push(Decimal(row.condition).toString())
             }
 
-            const promotedText = (() => {
-                if (row.back) {
-                    const { type } = getReverseOdd({ type: row.type, condition: row.condition })
-                    return ODD_TYPE_TEXT[type]
-                } else {
-                    return ODD_TYPE_TEXT[row.type]
-                }
+            const reverseText = (() => {
+                const { type } = getReverseOdd({ type: row.type, condition: row.condition })
+                return ODD_TYPE_TEXT[type]
             })()
 
             return (
                 <>
                     <div>{texts.join(' ')}</div>
                     <div>{'水位≥' + Number(row.value)}</div>
+
                     <div>
-                        <NTag size="tiny" type="error">
-                            {promotedText}
-                        </NTag>
+                        {row.back ? (
+                            <NTag size="tiny" type="error">
+                                {reverseText}
+                            </NTag>
+                        ) : (
+                            <NTag size="tiny" type="success">
+                                {ODD_TYPE_TEXT[row.type]}
+                            </NTag>
+                        )}
                     </div>
                 </>
             )
