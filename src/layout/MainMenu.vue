@@ -39,6 +39,10 @@ const menuOptions: MenuOption[] = [
         label: '滚球3数据',
     },
     {
+        key: '/model3',
+        label: '模型3数据',
+    },
+    {
         key: '/manual_promote',
         label: '手动推荐',
     },

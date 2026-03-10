@@ -21,6 +21,7 @@ import Tournaments from './pages/Tournaments.vue'
 import Users from './pages/Users.vue'
 import Versions from './pages/Versions.vue'
 import VipRecords from './pages/VipRecords.vue'
+import Model3 from './pages/Model3.vue'
 
 export const router = createRouter({
     history: createMemoryHistory(),
@@ -103,6 +104,10 @@ export const router = createRouter({
                 {
                     path: '/versions',
                     component: Versions,
+                },
+                {
+                    path: '/model3',
+                    component: Model3,
                 },
             ],
         },
