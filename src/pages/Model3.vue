@@ -173,7 +173,7 @@ const columns: DataTableColumn<Model3Data>[] = [
                     </NFlex>
                     <NFlex align="center" size={4}>
                         <NTag size="tiny">客</NTag>
-                        <span>{row.team1_name}</span>
+                        <span>{row.team2_name}</span>
                     </NFlex>
                 </>
             )
